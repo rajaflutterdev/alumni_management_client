@@ -15,88 +15,89 @@ class Languages_Page extends StatefulWidget {
 }
 
 class _Languages_PageState extends State<Languages_Page> {
-  List<ChooseLanguageModel> languagesList = [
-    ChooseLanguageModel(
+  List<LanguageModel> languagesList = [
+    LanguageModel(
       name: "Tamil",
       orgName: "தமிழ்",
       code: "ta",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "English",
       orgName: "English",
       code: "en_US",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Hindi",
       orgName: "हिंदी",
       code: "hi",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Telugu",
       orgName: "తెలుగు",
       code: "te",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Malayalam",
       orgName: "മലയാളം",
       code: "ml",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Kannada",
       orgName: "ಕನ್ನಡ",
       code: "kn",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Bengali",
       orgName: "বাংলা",
       code: "bn",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Gujarati",
       orgName: "ગુજરાતી",
       code: "Gujarath",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Urdu",
       orgName: "اُردُو",
       code: "Urdu",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Odia",
       orgName: "ଓଡ଼ିଆ",
       code: "Odia",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Assamese",
       orgName: "ଓଡ଼ିଆ",
       code: "Assamese",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Maithili",
       orgName: "Macushi",
       code: "Maithili",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Sanskrit",
       orgName: "संस्कृतम्",
       code: "Sanskrit",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Punjabi",
       orgName: "ਪੰਜਾਬੀ",
       code: "Punjabi",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Punjabi",
       orgName: "ਪੰਜਾਬੀ",
       code: "Punjabi",
     ),
-    ChooseLanguageModel(
+    LanguageModel(
       name: "Marathi",
       orgName: "मराठी",
       code: "Marathi",
     ),
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +120,7 @@ class _Languages_PageState extends State<Languages_Page> {
                 child: const Icon(Icons.arrow_back),
               ),
             ),
+
             Padding(
               padding: EdgeInsets.only(left: width / 27.428),
               child: SizedBox(
@@ -164,7 +166,7 @@ class _Languages_PageState extends State<Languages_Page> {
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
                                 childAspectRatio: 26 / 20),
-                            itemBuilder: (BuildContext context, int i) {
+                            itemBuilder: (BuildContext cxt, int i) {
                               return Padding(
                                 padding:  EdgeInsets.symmetric(
                                     horizontal: width/78.4, vertical: height/100.25),
@@ -172,17 +174,12 @@ class _Languages_PageState extends State<Languages_Page> {
                                   splashColor: Colors.white,
                                    highlightColor: Colors.white,
                                   onTap: (){
-                                    setState(() {
-                                      changeLocale(context, languagesList[i].code!);
-                                    });
-                                    setState(() {
-
-                                    });
+                                       changeLocale(cxt, languagesList[i].code!);
+                                     print("change Language-)))))))))))))))))))))))))))))))");
+                                     print(languagesList[i].code);
                                     print("helooooo____________________________");
-                                    Get.offAll(const Landing_Screen(),curve: Curves.easeIn,
-                                        duration: const Duration(milliseconds: 600),
-                                        transition: Transition.circularReveal);
-                                   // Navigator.pop(context);
+
+                                    Navigator.pop(context);
                                   },
                                   child: Material(
                                     elevation: 5,
@@ -241,8 +238,8 @@ class _Languages_PageState extends State<Languages_Page> {
   }
 }
 
-class ChooseLanguageModel {
-  ChooseLanguageModel({this.name, this.code, this.orgName});
+class LanguageModel {
+  LanguageModel({this.name, this.code, this.orgName});
 
   String? name;
   String? orgName;

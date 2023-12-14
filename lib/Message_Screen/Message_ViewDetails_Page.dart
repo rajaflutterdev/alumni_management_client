@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
+import "package:http/http.dart" as http;
 import '../Constant_File.dart';
 import '../Translator_Module/Translator_Module_Page.dart';
 
@@ -13,8 +15,9 @@ class Message_ViewDetails_Page extends StatefulWidget {
   String?userProfile;
   String?userdepartment;
   String?userBatch;
+  String?userToken;
    Message_ViewDetails_Page({this.userDocid,
-   this.userName,this.userBatch,this.userdepartment,this.userProfile,
+   this.userName,this.userBatch,this.userdepartment,this.userProfile,this.userToken
    });
 
   @override
@@ -34,7 +37,8 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
-    return Scaffold(
+    return
+      Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: const SizedBox(),
@@ -130,9 +134,11 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
          ),
       ),
       body: Container(
+        height: height/1,
         decoration: BoxDecoration(
             color: Colors.grey.shade200,
             image: DecorationImage(
+
               image: AssetImage(backgroudPattern,),
             )
         ),
@@ -164,10 +170,10 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
                                         ),
                                         child: Container(
                                           margin:
-                                          widget.userDocid==FirebaseAuth.instance.currentUser!.uid?
+                                          messagedata['From']=="Client"?
                                           EdgeInsets.only(right: width/39.2):
                                           EdgeInsets.only(left: width/39.2),
-                                          child: widget.userDocid==FirebaseAuth.instance.currentUser!.uid?
+                                          child: messagedata['From']=="Client"?
                                           Align(
                                             alignment:  Alignment.topRight,
                                             child: Material(
@@ -233,7 +239,7 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
                                                 child: Column(
                                                   children: [
                                                     KText(
-                                                      text:messagedata['msg'].toString(),
+                                                      text:messagedata['Message'].toString(),
                                                       style:GoogleFonts.nunito(color: Colors.black,
                                                           fontSize:width/24.5,
                                                           fontWeight: FontWeight.w600
@@ -342,6 +348,9 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
     "From": "Client",
     "date":"${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}"
     });
+
+    sendPushMessage(title: widget.userName.toString(),body: msgController.text,token: widget.userToken.toString());
+
     FirebaseFirestore.instance.collection("Users").
     doc(FirebaseAuth.instance.currentUser!.uid).collection("Messages").doc().set({
       "Message": msgController.text,
@@ -355,6 +364,32 @@ class _Message_ViewDetails_PageState extends State<Message_ViewDetails_Page> {
     });
     //FocusScope.of(context).unfocus();
   }
+  void sendPushMessage({required String token, required String body, required String title}) async {
+    try {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+          'key=AAAAMbpijGg:APA91bGJh2qke8JHGkBaJvJ5-mSnllb0aAIi-lF2YKt9MejKB-m51-SQZJR2u3tYdC9UsOB0ps_G6n29EuZPGFW5xAp4lHQDFWi11TFSDn65VyXYyFY0c-SzXuwk2fE31ADp9MdryFBB',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{'body': body, 'title': title},
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            "to": token,
+          },
+        ),
+      );
 
+    } catch (e) {
+      print("error push notification");
+    }
+  }
 
 }

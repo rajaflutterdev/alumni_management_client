@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,10 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Constant_File.dart';
 import '../Translator_Module/Translator_Module_Page.dart';
+import 'Group_Chat_Screen.dart';
 import 'Message_ViewDetails_Page.dart';
 
 class Message_Screen extends StatefulWidget {
-  const Message_Screen({super.key});
+  String?UserDepartment;
+  String?UserPassedYear;
+   Message_Screen({this.UserDepartment,this.UserPassedYear});
 
   @override
   State<Message_Screen> createState() => _Message_ScreenState();
@@ -21,7 +25,8 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
 
 
   @override
-  void initState() {
+  initState()  {
+    getToekt();
     tabController=TabController(length: 2, vsync: this)  ;
     // TODO: implement initState
     super.initState();
@@ -29,7 +34,10 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
 
   TabController?tabController;
   int selectTabIndex=0;
-
+getToekt()async{
+  String? token = await FirebaseMessaging.instance.getToken();
+  print(token);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +46,7 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
     return Column(
 
       children: [
+
         Padding(
           padding:  EdgeInsets.only(top: height/40.1),
           child: Row(
@@ -65,6 +74,7 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
             ],
           ),
         ),
+
         SizedBox(height: height/53.466,),
 
         TabBar(
@@ -72,7 +82,7 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
           labelColor: buttoncolor,
           dividerColor: Colors.transparent,
           isScrollable: false,
-          indicatorSize: TabBarIndicatorSize.label,
+          indicatorSize: TabBarIndicatorSize.tab,
           indicatorColor: Colors.red,
           physics: BouncingScrollPhysics(),
           indicatorPadding: const EdgeInsets.symmetric(
@@ -104,145 +114,239 @@ class _Message_ScreenState extends State<Message_Screen> with SingleTickerProvid
 
           ],
         ),
+
         SizedBox(
           height:height/1.008,
           child: TabBarView(
             controller: tabController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: [
 
-             StreamBuilder(
-                 stream:FirebaseFirestore.instance.collection("Users").orderBy("timestamp").snapshots() ,
+              SizedBox(
+               width:width/1.37,
+               child: StreamBuilder(
+                   stream:FirebaseFirestore.instance.collection("Users").orderBy("timestamp").snapshots() ,
 
-                 builder: (context, snapshot) {
+                   builder: (context, snapshot) {
 
-                   if(!snapshot.hasData){
-                     return const Center(child: CircularProgressIndicator(),);
-                   }
-                   if(snapshot.hasData==null){
-                     return const Center(child: CircularProgressIndicator(),);
-                   }
-
-
-                   return
-                     ListView.builder(
-                     physics: const BouncingScrollPhysics(),
-                     shrinkWrap: true,
-                     itemCount: snapshot.data!.docs.length,
-                     itemBuilder: (context, index) {
-                       var Userdata=snapshot.data!.docs[index];
-                       return
-                         GestureDetector(
-                         onTap: (){
-                           print(Userdata.id);
-                           print(Userdata['Batch'].toString());
-                           print(Userdata['department'].toString());
-                           print(Userdata['UserImg'].toString());
-                           print(Userdata['Name'].toString());
-                           print(Userdata['userDocId'].toString());
-                           Get.to(
-                               Message_ViewDetails_Page(
-                             userDocid:Userdata.id,
-                             userBatch: Userdata['Batch'].toString(),
-                             userdepartment: Userdata['department'].toString(),
-                             userName: Userdata['Name'].toString(),
-                             userProfile:Userdata['UserImg'].toString()==""?AvatorImg.toString():Userdata['UserImg'].toString(),
-                           ),transition: Transition.zoom ,
-                               curve: Curves.linearToEaseOut,
-                               duration: Duration(milliseconds: 200)
-                           );
-                         },
-                         child: Material(
-                           elevation:15,
-                           color: Color(0xffFFFFFF),
-                           //color: Colors.red,
-                           shadowColor: Colors.black12,
-                           child: Container(
-                               height: height/8.02,
-                               width:double.infinity,
-                               decoration: BoxDecoration(
-                                   color:Color(0xffFFFFFF),
-                                   // color: Colors.red,
-                                   border: Border(
-                                       bottom: BorderSide(
-                                           color: Colors.grey.shade300
-                                       )
-                                   )
-                               ),
-                               child:Padding(
-                                 padding:  EdgeInsets.symmetric(
-                                     horizontal: width/49,
-                                     vertical: height/100.25
-                                 ),
-                                 child: Row(
-                                   children: [
-                                     Container(
-                                       height: height/16.04,
-                                       width: width/7.84,
-                                       decoration: BoxDecoration(
-                                           color: Colors.grey,
-                                           borderRadius: BorderRadius.circular(100),
-                                           image: DecorationImage(
-                                             image: NetworkImage(Userdata['UserImg'].toString()),
-
-                                           )
-                                       ),
-                                     ),
-                                     Padding(
-                                       padding:  EdgeInsets.only(left:width/49),
-                                       child: Column(
-                                         mainAxisAlignment: MainAxisAlignment.center,
-                                         children: [
-                                           SizedBox(
-                                            width: width/1.6333,
-                                             height:height/40.1,
-                                             child:
-                                             KText(
-                                               text:Userdata['Name'].toString(),
-                                               style: GoogleFonts.nunito(
-                                                   fontSize: width/26.1333,
-                                                   fontWeight: FontWeight.w800,
-                                                   textStyle: TextStyle(
-                                                     //  overflow: TextOverflow.ellipsis,
-                                                   )
-                                               ),),
-                                           ),
-                                           SizedBox(
-                                            width: width/1.6333,
-                                             height: height/40.1,
-                                             child:  KText(
-                                               text:"${Userdata['department'].toString()} ${Userdata['Batch'].toString()}Batch",
-                                               style: GoogleFonts.nunito(
-                                                   fontSize: width/30.153,
-                                                   color: Color(0xff000000),
-                                                   fontWeight: FontWeight.w600,
-                                                   textStyle: TextStyle(
-                                                       overflow: TextOverflow.ellipsis
-                                                   )
-                                               ),),
-                                           ),
+                     if(!snapshot.hasData){
+                       return const Center(child: CircularProgressIndicator(),);
+                     }
+                     if(snapshot.hasData==null){
+                       return const Center(child: CircularProgressIndicator(),);
+                     }
 
 
-                                         ],
-                                       ),
+                     return
+                       ListView.builder(
+                       physics: const BouncingScrollPhysics(),
+                       shrinkWrap: true,
+                       itemCount: snapshot.data!.docs.length,
+                       itemBuilder: (context, index) {
+                         var Userdata=snapshot.data!.docs[index];
+                         if(Userdata['userDocId']!=FirebaseAuth.instance.currentUser!.uid) {
+                           return
+                             GestureDetector(
+                               onTap: () {
+
+                                 print(Userdata.id);
+                                 print(Userdata['class'].toString());
+                                 print(Userdata['UserImg'].toString());
+                                 print(Userdata['Name'].toString());
+                                 print(Userdata['userDocId'].toString());
+                                 // Get.to(
+                                 //     Message_ViewDetails_Page(
+                                 //       userDocid: Userdata.id,
+                                 //       userBatch: Userdata['yearofpassed'].toString(),
+                                 //       userdepartment: Userdata['class'].toString(),
+                                 //       userName: Userdata['Name'].toString(),
+                                 //       userToken: Userdata['Token'].toString(),
+                                 //       userProfile: Userdata['UserImg'].toString() == "" ? AvatorImg.toString() : Userdata['UserImg'].toString(),
+                                 //     ), transition: Transition.zoom,
+                                 //     curve: Curves.linearToEaseOut,
+                                 //     duration: Duration(milliseconds: 200)
+                                 // );
+
+                                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  Message_ViewDetails_Page(
+                                   userDocid: Userdata.id,
+                                   userBatch: Userdata['yearofpassed'].toString(),
+                                   userdepartment: Userdata['class'].toString(),
+                                   userName: Userdata['Name'].toString(),
+                                   userToken: Userdata['Token'].toString(),
+                                   userProfile: Userdata['UserImg'].toString() == "" ? AvatorImg.toString() : Userdata['UserImg'].toString(),
+                                 ),));
+                               },
+                               child: Container(
+                                 decoration: BoxDecoration(
+                                     border: Border(
+                                         bottom: BorderSide(
+                                             color: Colors.grey.shade300
+                                         )
                                      )
-                                   ],
                                  ),
-                               )
-                           ),
-                         ),
-                       );
-                     },
-                   );
-                 },),
+                                 child:
+                                 ListTile(
+                                   leading: Container(
+                                     height: height / 16.04,
+                                     width: width / 7.84,
+                                     decoration: BoxDecoration(
+                                         color: Colors.grey,
+                                         borderRadius: BorderRadius
+                                             .circular(100),
+                                         image: DecorationImage(
+                                           image: NetworkImage(
+                                               Userdata['UserImg']
+                                                   .toString()),
+
+                                         )
+                                     ),
+                                   ),
+                                   title: SizedBox(
+                                     width: width / 1.6333,
+                                     height: height / 40.1,
+                                     child:
+                                     KText(
+                                       text: Userdata['Name']
+                                           .toString(),
+                                       style: GoogleFonts.nunito(
+                                           fontSize: width /
+                                               26.1333,
+                                           fontWeight: FontWeight
+                                               .w800,
+                                           textStyle: TextStyle(
+                                             //  overflow: TextOverflow.ellipsis,
+                                           )
+                                       ),),
+                                   ),
+                                   subtitle:  SizedBox(
+                                     width: width / 1.6333,
+                                     height: height / 40.1,
+                                     child: KText(
+                                       text: Userdata['class'].toString(),
+                                       style: GoogleFonts.nunito(
+                                           fontSize: width /
+                                               30.153,
+                                           color: const Color(
+                                               0xff000000),
+                                           fontWeight: FontWeight
+                                               .w600,
+                                           textStyle: const TextStyle(
+                                               overflow: TextOverflow
+                                                   .ellipsis
+                                           )
+                                       ),),
+                                   ),
+                                 ),
+                               ),
+                             );
+                         }
+                         return const SizedBox(
+                         );
+                       },
+                     );
+                   },),
+             ),
+
+              StreamBuilder(
+                stream:FirebaseFirestore.instance.collection("Groups").where("Department",isEqualTo:widget.UserDepartment)
+                    .where("AccademicYear",isEqualTo:widget.UserPassedYear).snapshots() ,
+
+                builder: (context, snap) {
+
+                  if(!snap.hasData){
+                    return const Center(child: CircularProgressIndicator(),);
+                  }
+                  if(snap.hasData==null){
+                    return const Center(child: CircularProgressIndicator(),);
+                  }
 
 
+                  return
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snap.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        var groupData=snap.data!.docs[index];
+                        return
+                          GestureDetector(
+                            onTap: (){
+                              // Get.to(
+                              //     Group_Chat_Screen(
+                              //       Docid: groupData.id,
+                              //       groupdepart: groupData['Department'].toString(),
+                              //       grouppassesyear:  groupData['AccademicYear'].toString(),
+                              //       groupImg: groupData['Img'].toString()==""?AvatorImg.toString():groupData['Img'].toString(),
+                              //     ),transition: Transition.zoom ,
+                              //     curve: Curves.linearToEaseOut,
+                              //     duration: Duration(milliseconds: 200)
+                              // );
 
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Group_Chat_Screen(
+                                Docid: groupData.id,
+                                groupdepart: groupData['Department'].toString(),
+                                grouppassesyear:  groupData['AccademicYear'].toString(),
+                                groupImg: groupData['Img'].toString()==""?AvatorImg.toString():groupData['Img'].toString(),
+                              ) ,));
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          color: Colors.grey.shade300
+                                      )
+                                  )
+                              ),
+                              child: ListTile(
+                                leading: Container(
+                                  height: height/16.04,
+                                  width: width/7.84,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(100),
+                                      image: DecorationImage(
+                                        image: NetworkImage(groupData['Img'].toString()),
 
+                                      )
+                                  ),
+                                ),
+                                title:  SizedBox(
+                                  width: width/1.6333,
+                                  height:height/40.1,
+                                  child:
+                                  KText(
+                                    text:groupData['Department'].toString(),
+                                    style: GoogleFonts.nunito(
+                                        fontSize: width/26.1333,
+                                        fontWeight: FontWeight.w800,
+                                        textStyle: TextStyle(
+                                          //  overflow: TextOverflow.ellipsis,
+                                        )
+                                    ),),
+                                ),
+                                subtitle:  SizedBox(
+                                  width: width/1.6333,
+                                  height: height/40.1,
+                                  child:  KText(
+                                    text:"${groupData['AccademicYear'].toString()}",
+                                    style: GoogleFonts.nunito(
+                                        fontSize: width/30.153,
+                                        color: Color(0xff000000),
+                                        fontWeight: FontWeight.w600,
+                                        textStyle: TextStyle(
+                                            overflow: TextOverflow.ellipsis
+                                        )
+                                    ),),
+                                ),
+                              ),
+                            ),
+                          );
+                      },);
+                },),
 
             ],
           ),
         ),
+
         SizedBox(height: height/40.1,),
 
       ],

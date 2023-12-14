@@ -243,10 +243,14 @@ class _LogIn_ScreenState extends State<LogIn_Screen> {
 
 
   AlumniDatacheckfuntion()async{
+
     var userdata=await FirebaseFirestore.instance.collection("Users").where("verifyed",isEqualTo:true)
         .where("Name",isEqualTo: nameController.text).where("Phone",isEqualTo: phoneController.text).get();
     print(userdata.docs.length);
     print("Length++++++++++++++++++");
+    print(nameController.text);
+    print(phoneController.text);
+    print("Length++++++++++++++++++__________________________________________________");
     if(userdata.docs.length>0){
       print("Enter_____________++++++++++++0");
     setState(() {

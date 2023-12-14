@@ -1,13 +1,15 @@
+import 'package:alumni_management_client/Constant_File.dart';
 import 'package:alumni_management_client/Language_Page/Language_Page.dart';
-import 'package:alumni_management_client/Translator_Module/Translator_Module_Page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Constant_File.dart';
-import '../Message_Screen/Message_Screen.dart';
+import 'package:lottie/lottie.dart';
+import '../Authndication_Pages/Login_Screen.dart';
 import '../Slders_screen/Slider_Screen.dart';
+import '../Translator_Module/Translator_Module_Page.dart';
 
 
 class Home_Screen extends StatefulWidget {
@@ -45,14 +47,25 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KText(
-                    text: "${landingQuote1} ${widget.Username.toString()}👋",style: GoogleFonts.nunito(
-                      fontSize: width/16.6,
-                      fontWeight: FontWeight.w700),),
-                  KText(
-                    text:"${landingQuote2}",style: GoogleFonts.nunito(
-                      fontSize: width/22.5,
-                      fontWeight: FontWeight.w700),),
+                  GestureDetector(
+                    onTap: (){
+                      print(height);
+                      print(width);
+                    },
+                    child: KText(
+                      text: "${landingQuote1} ${widget.Username.toString()}👋",style: GoogleFonts.nunito(
+                        fontSize: width/16.6,
+                        fontWeight: FontWeight.w700),),
+                  ),
+                  SizedBox(
+                    width:width/1.3,
+                    child: FittedBox(
+                      child: KText(
+                        text:"${landingQuote2}",style: GoogleFonts.nunito(
+                          fontSize: width/22.5,
+                          fontWeight: FontWeight.w700),),
+                    ),
+                  ),
                 ],
               ),
 
@@ -192,13 +205,15 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                           height: height/10.6933,
                                           width: width/5.226,
                                           decoration: BoxDecoration(
-                                              color: Colors.grey,
+                                              color: Colors.grey.shade200,
                                               borderRadius: BorderRadius.circular(5),
                                               image: DecorationImage(
+                                                fit: BoxFit.cover,
                                                   image: NetworkImage(clgActivitied['img'].toString())
                                               )
                                           ),
                                         ),
+
                                         Padding(
                                           padding:  EdgeInsets.only(left:width/49),
                                           child: Column(
@@ -289,7 +304,9 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                     shrinkWrap: true,
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
+
                       var clgActivitied=snapshot.data!.docs[index];
+
                       return  GestureDetector(
                         onTap:(){
                           streamDetailsPopup(
@@ -328,9 +345,10 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                      height: height/10.6933,
                                       width: width/5.226,
                                       decoration: BoxDecoration(
-                                          color: Colors.grey,
+                                          color: Colors.grey.shade200,
                                           borderRadius: BorderRadius.circular(5),
                                           image: DecorationImage(
+                                            fit: BoxFit.cover,
                                               image: NetworkImage(clgActivitied['img'].toString())
                                           )
                                       ),
@@ -463,9 +481,10 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                      height: height/10.6933,
                                       width: width/5.226,
                                       decoration: BoxDecoration(
-                                          color: Colors.grey,
+                                          color: Colors.grey.shade200,
                                           borderRadius: BorderRadius.circular(5),
                                           image: DecorationImage(
+                                            fit: BoxFit.cover,
                                               image: NetworkImage(clgActivitied['img'].toString())
                                           )
                                       ),
@@ -579,11 +598,13 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
              fontWeight: FontWeight.w700,
            ),
           onTap: (){
-             Get.to(Languages_Page(),
-             curve: Curves.easeIn,
-               duration: Duration(milliseconds: 500),
-               transition: Transition.circularReveal
-             );
+
+             // Get.to(Languages_Page(),
+             // curve: Curves.easeIn,
+             //   duration: Duration(milliseconds: 500),
+             //   transition: Transition.circularReveal
+             // );
+             Navigator.push(context, MaterialPageRoute(builder: (context) =>Languages_Page() ,));
           },
           value: 1,
           child:  KText(
@@ -608,12 +629,31 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
 
           ),
         ),
+         PopupMenuItem(
+           textStyle: GoogleFonts.nunito(
+             fontWeight: FontWeight.w700,
+           ),
+          onTap: (){
+            siginoutpopup();
+          },
+          value: 3,
+          child:  KText(
+            text:
+            "Log Out",
+            style: GoogleFonts.nunito(
+              fontWeight: FontWeight.w700,
+            ),
+
+          ),
+        ),
       ],
       elevation: 8.0,
     ).then((value) {
       if (value != null) print(value);
     });
   }
+
+
 
 
   streamDetailsPopup({contentImg,contentTitle,contentSubtitle,contentTime,StreamName}){
@@ -717,5 +757,73 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
           );
 
       },);
+  }
+
+
+  Future<void> siginoutpopup() async {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Padding(
+            padding:  EdgeInsets.only(top:15),
+            child: KText(
+              text:"Are You Want To Logout",
+              align:  TextAlign.center,
+              style: GoogleFonts.nunito(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                fontSize: width / 23,
+              ),
+            ),
+          ),
+          content: SizedBox(
+            height: height / 3.8,
+            child: Column(
+              children: [
+                Container(
+                    height: height/5.2,
+                    color:Colors.transparent,
+                    child:Lottie.asset(LogOutLottie)),
+                Padding(
+                  padding: EdgeInsets.only(left: width / 45,top:height/86.6),
+                  child: GestureDetector(
+                    onTap: (){
+                      FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LogIn_Screen(),));
+                    },
+                    child: Container(
+
+                      height: height/24.0,
+                      width: width/5.5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: buttoncolor,
+                      ),
+                      child: Center(
+                        child: KText(
+                          text: "Yes",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: width / 26,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          alignment: Alignment.center,
+          actionsAlignment: MainAxisAlignment.center,
+          titlePadding: EdgeInsets.symmetric(
+              horizontal: width / 45, vertical: height / 94.5),
+        );
+      },
+    );
   }
 }

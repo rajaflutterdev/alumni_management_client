@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:alumni_management_client/Translator_Module/Translator_Module_Page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
+import '../Authndication_Pages/Login_Screen.dart';
 import '../Constant_File.dart';
 import '../Home_Screen/Home_Screen.dart';
 import '../Menbers_Screen/Member_Screen.dart';
@@ -12,7 +17,8 @@ import '../Profile_Page/Profile_Page.dart';
 
 
 class Landing_Screen extends StatefulWidget {
-  const Landing_Screen({super.key});
+  String?userDocumentID;
+   Landing_Screen({this.userDocumentID});
 
   @override
   State<Landing_Screen> createState() => _Landing_ScreenState();
@@ -26,9 +32,14 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
   String Userqulification="";
   String Useroccupation="";
   String UserImg="";
+  String UsersDepartment="";
+  String UsersPassedYear="";
+  double lat = 0.0;
+  double lon = 0.0;
   @override
   void initState() {
     UserGetDataFuntion();
+    getLatLng();
     // TODO: implement initState
     super.initState();
   }
@@ -53,9 +64,15 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
               bottomItemValue==0?
               Home_Screen(Username: Username,):
               bottomItemValue==1?
-              const Member_Screen():
+               Member_Screen(
+                userLatitude: lat,
+                userLongtitude: lon,
+              ):
               bottomItemValue==2?
-              const Message_Screen()
+               Message_Screen(
+                UserDepartment: UsersDepartment,
+                UserPassedYear: UsersPassedYear,
+              )
               :Profile_Page(
                 userName: Username,
                 userLoaction: Userloaction,
@@ -77,6 +94,8 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
           children: [
             GestureDetector(
               onTap: (){
+                print(height);
+                print(width);
                 setState(() {
                   bottomItemValue=0;
                 });
@@ -165,25 +184,60 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
   }
 
   UserGetDataFuntion()async{
+    print(widget.userDocumentID);
     print("Enter+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    var Userdata=await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid ).get();
-
-    Map<String,dynamic>?value=Userdata.data();
+    var Userdata=await FirebaseFirestore.instance.collection('Users').
+    where("userDocId",isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+    await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      Username = value!["Name"].toString();
-      Userloaction = value["location"].toString();
-      Userqulification = value["qualification"].toString();
-      Useroccupation = value["Occupation"].toString();
-      UserImg =value["UserImg"].toString()==""?AvatorImg: value["UserImg"].toString();
+      lat = position.latitude!;
+      lon = position.longitude!;
     });
+   if(Userdata.docs.length>0){
+     setState(() {
+       Username = Userdata.docs[0]["Name"].toString();
+       Userloaction = Userdata.docs[0]["Address"].toString();
+       Userqulification = Userdata.docs[0]["educationquvalification"].toString();
+       Useroccupation = Userdata.docs[0]["Occupation"].toString();
+       UsersDepartment = Userdata.docs[0]["subjectStream"].toString();
+       UsersPassedYear = Userdata.docs[0]["yearofpassed"].toString();
+       UserImg =Userdata.docs[0]["UserImg"].toString()==""?AvatorImg: Userdata.docs[0]["UserImg"].toString();
+     });
 
-    print(Username);
-    print(Userloaction);
-    print(Useroccupation);
-    print(Userqulification);
-    print(UserImg);
-    print("+++++++++++++++++++++++++");
+     FirebaseFirestore.instance.collection('Users').doc(Userdata.docs[0].id).update({
+       "latitude":lat,
+       "longtitude":lon
+     });
+
+     print(Username);
+     print(Userloaction);
+     print(Userqulification);
+     print(Useroccupation);
+     print(UserImg);
+
+     print("departmentsssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+     print(UsersDepartment);
+     print(UsersPassedYear);
+     print("Printing the Users Detailsssssssssssssssssssssssssssssssssssssssss");
+   }
   }
 
+
+  getLatLng() async {
+
+
+
+    print("Longtitude_____________________________________$lon");
+    print("Lattttitude_____________________________________$lat");
+  }
+
+
+
+
+
 }
+
+
+
 

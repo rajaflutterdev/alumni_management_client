@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
@@ -30,14 +32,23 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
   var _verificationCode;
   String PinValue='';
 
-
+  double lat = 0.0;
+  double lon = 0.0;
   @override
   void initState() {
     // TODO: implement initState
     _verifyphone();
+    getLatLng();
     super.initState();
   }
 
+
+  String _currentAddress="";
+  String _currentpincode="";
+  Position? _currentPosition;
+  TextEditingController name= new TextEditingController();
+  TextEditingController area= new TextEditingController();
+  TextEditingController pincode= new TextEditingController();
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
@@ -58,7 +69,7 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
                   ),
                   SizedBox(
                       width: width/1.152941176470588,
-                      child: Center(child: Text("Verification code ",style: GoogleFonts.nunito(fontSize: 18,fontWeight: FontWeight.w800,color: Colors.black),)))
+                      child: Center(child: Text("Verification code ",style: GoogleFonts.nunito(fontSize: width/22.83333333333333,fontWeight: FontWeight.w800,color: Colors.black),)))
                 ],
               ),
 
@@ -115,7 +126,7 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
                       if(value.user!=null){
                         userdata();
                         Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context)=> const Landing_Screen()));
+                            MaterialPageRoute(builder: (context)=>  Landing_Screen(userDocumentID:widget.userDocumentID ,)));
                       }
                     });
                   }
@@ -233,8 +244,6 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
     },);
   }
 
-
-
   _verifyphone()async{
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: "+91${widget.phone}" ,
@@ -242,7 +251,7 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
           await FirebaseAuth.instance.signInWithCredential(credential).then((value)async{
             if(value.user!=null){
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context)=> const Landing_Screen()));
+                  MaterialPageRoute(builder: (context)=>  Landing_Screen(userDocumentID: widget.userDocumentID,)));
             }
           });
         },
@@ -271,24 +280,39 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
       "Phone":widget.phone,
       "Name":widget.name,
       "Token":token,
-   //   "UserImg":"",
-      //"qualification":"",
-    //  "location":"",
-    //  "department":"",
-   //   "Batch":"",
       "userDocId":FirebaseAuth.instance.currentUser!.uid,
-    //  "verifyed":false,
-     // "lastchat":"",
-     // "Address":"",
-    //  "Email":"",
-     // "Gender":"",
-     // "Occupation":"",
-    //  "ischat":false,
+      "Address":_currentAddress,
+      "latitude":lat,
+      "longtitude":lon,
       "timestamp":DateTime.now().millisecondsSinceEpoch,
       "date":"${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
       "time":DateFormat("hh:mm: a").format(DateTime.now()),
     });
 
+  }
+
+  getLatLng() async {
+    await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    _getAddressFromLatLng(position);
+    setState(() {
+      lat = position.latitude!;
+      lon = position.longitude!;
+    });
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    await placemarkFromCoordinates(
+        _currentPosition!.latitude, _currentPosition!.longitude)
+        .then((List<Placemark> placemarks) {
+      Placemark place = placemarks[0];
+      setState(() {
+        _currentAddress = '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea},${place.postalCode}';
+        _currentpincode = '${place.postalCode}';
+      });
+    }).catchError((e) {
+      debugPrint(e);
+    });
   }
 
 }

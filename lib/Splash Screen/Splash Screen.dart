@@ -2,6 +2,7 @@ import 'package:alumni_management_client/Constant_File.dart';
 import 'package:alumni_management_client/Landing_Screen/Landing_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
@@ -24,6 +25,7 @@ class _Splash_ScreenState extends State<Splash_Screen> {
     Future.delayed(Duration(seconds: 5),(){
       if(FirebaseAuth.instance.currentUser==null){
         print("Authendiction success");
+        
         Get.offAll(Intro_Screen_1(),
             transition: Transition.zoom,
             duration: Duration(milliseconds: 500),
@@ -31,12 +33,13 @@ class _Splash_ScreenState extends State<Splash_Screen> {
         );
       }
       else{
-        print("faild");
-      Get.offAll(Landing_Screen(),
-      transition: Transition.zoom,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeIn
-      );
+      //   print("faild");
+      // Get.offAll(Landing_Screen(),
+      // transition: Transition.zoom,
+      // duration: Duration(milliseconds: 500),
+      // curve: Curves.easeIn
+      // );
+        Navigator.push(context, MaterialPageRoute(builder: (context) =>Landing_Screen() ,));
       }
 
 

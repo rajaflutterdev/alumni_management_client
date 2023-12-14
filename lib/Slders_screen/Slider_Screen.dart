@@ -42,13 +42,9 @@ class _Slider_ScreenState extends State<Slider_Screen> {
           FutureBuilder(
             future: getSliderImageFromDb(),
             builder: (_, AsyncSnapshot<List<QueryDocumentSnapshot<Map<String, dynamic>>>> snapShot)  {
-
               return snapShot.data == null? const Scaffold(
                 body: Center(
-
-                  child: CircularProgressIndicator(
-
-                  ),
+                  child: CircularProgressIndicator(),
                 ),
               )
                   :

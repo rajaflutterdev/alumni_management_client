@@ -7,7 +7,7 @@ Color bottomItemSlectedColor=Color(0xff605BFF);
 Color bottomItemUnSlectedColor=Color(0xff515960);
 
 String SplashScreenImg="assets/SplshScrren.png";
-
+String LogOutLottie="assets/Signout (1).json";
 String AvatorImg="https://firebasestorage.googleapis.com/v0/b/alumni-management-b7491.appspot.com/o/147131-removebg-preview.png?alt=media&token=c7ac458c-4cf4-402b-bb83-6640d63d6953";
 
 ///otp Screen
