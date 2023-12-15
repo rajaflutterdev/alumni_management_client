@@ -55,6 +55,9 @@ dependencies:
   http: any
   geolocator: ^10.1.0
   geocoding: ^2.1.0
+  simple_ripple_animation: ^0.0.8
+  animate_do: ^3.1.2
+  awesome_bottom_bar: ^1.2.4
 
 
 

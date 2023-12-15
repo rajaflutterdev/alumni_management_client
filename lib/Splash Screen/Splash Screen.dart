@@ -26,11 +26,13 @@ class _Splash_ScreenState extends State<Splash_Screen> {
       if(FirebaseAuth.instance.currentUser==null){
         print("Authendiction success");
         
-        Get.offAll(Intro_Screen_1(),
-            transition: Transition.zoom,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeIn
-        );
+        // Get.offAll(Intro_Screen_1(),
+        //     transition: Transition.zoom,
+        //     duration: Duration(milliseconds: 500),
+        //     curve: Curves.easeIn
+        // );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Intro_Screen_1() ,));
+
       }
       else{
       //   print("faild");
@@ -39,7 +41,7 @@ class _Splash_ScreenState extends State<Splash_Screen> {
       // duration: Duration(milliseconds: 500),
       // curve: Curves.easeIn
       // );
-        Navigator.push(context, MaterialPageRoute(builder: (context) =>Landing_Screen() ,));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Landing_Screen() ,));
       }
 
 

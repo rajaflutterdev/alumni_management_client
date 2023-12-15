@@ -256,12 +256,19 @@ class _LogIn_ScreenState extends State<LogIn_Screen> {
     setState(() {
     userDocumentID=userdata.docs[0].id;
     });
-    Get.to(Otp_Screen_Page(
+    // Get.to(Otp_Screen_Page(
+    //   name: nameController.text,
+    //   phone: phoneController.text,
+    //   userDocumentID: userDocumentID,
+    // ),
+    //     transition: Transition.cupertino,duration: Duration(milliseconds: 200));
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Otp_Screen_Page(
       name: nameController.text,
       phone: phoneController.text,
       userDocumentID: userDocumentID,
-    ),
-        transition: Transition.cupertino,duration: Duration(milliseconds: 200));
+    ),));
+
     }
     else{
       userNotVerifyedPopup();

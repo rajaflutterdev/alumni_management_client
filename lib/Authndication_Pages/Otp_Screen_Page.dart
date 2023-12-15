@@ -150,7 +150,7 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
                         congrationPopup();
                         Future.delayed(Duration(seconds: 2),(){
                           Navigator.pop(context);
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>Landing_Screen() ,));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Landing_Screen() ,));
 
                         });
 
@@ -250,7 +250,7 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
         verificationCompleted:(PhoneAuthCredential credential)async{
           await FirebaseAuth.instance.signInWithCredential(credential).then((value)async{
             if(value.user!=null){
-              Navigator.of(context).push(
+              Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context)=>  Landing_Screen(userDocumentID: widget.userDocumentID,)));
             }
           });
@@ -294,17 +294,19 @@ class _Otp_Screen_PageState extends State<Otp_Screen_Page> {
   getLatLng() async {
     await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    _getAddressFromLatLng(position);
+
     setState(() {
       lat = position.latitude!;
       lon = position.longitude!;
+      _currentPosition=position;
     });
+    _getAddressFromLatLng(position);
   }
 
   Future<void> _getAddressFromLatLng(Position position) async {
+    print("Addressssssssssssssssssssssssssssssssssssssssssssssssssss");
     await placemarkFromCoordinates(
-        _currentPosition!.latitude, _currentPosition!.longitude)
-        .then((List<Placemark> placemarks) {
+        _currentPosition!.latitude, _currentPosition!.longitude).then((List<Placemark> placemarks) {
       Placemark place = placemarks[0];
       setState(() {
         _currentAddress = '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea},${place.postalCode}';

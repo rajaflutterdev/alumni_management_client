@@ -174,10 +174,11 @@ class _Languages_PageState extends State<Languages_Page> {
                                   splashColor: Colors.white,
                                    highlightColor: Colors.white,
                                   onTap: (){
-                                       changeLocale(cxt, languagesList[i].code!);
-                                     print("change Language-)))))))))))))))))))))))))))))))");
-                                     print(languagesList[i].code);
-                                    print("helooooo____________________________");
+                                       setState(() {
+                                         changeLocale(cxt, languagesList[i].code!);
+                                         languaeName=languagesList[i].name!;
+                                       });
+
 
                                     Navigator.pop(context);
                                   },

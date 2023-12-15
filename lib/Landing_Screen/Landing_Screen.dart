@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:alumni_management_client/Translator_Module/Translator_Module_Page.dart';
+import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,8 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
   String UserImg="";
   String UsersDepartment="";
   String UsersPassedYear="";
+  String UsersDocID="";
+  String UsersrollNo="";
   double lat = 0.0;
   double lon = 0.0;
   @override
@@ -45,60 +48,104 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
   }
   
   
-  
+  PageController controller =PageController(initialPage: 0,keepPage: true);
+
   
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
+    List Pages=[
+      Home_Screen(Username: Username,UserAuthID: UsersDocID),
+      Member_Screen(
+        userLatitude: lat,
+        userLongtitude: lon,
+        userImage:UserImg,
+        userName: Username,
+          UsersrollNo:UsersrollNo
+      ),
+      Message_Screen(
+        UserDepartment: UsersDepartment,
+        UserPassedYear: UsersPassedYear,
+      ),
+      Profile_Page(
+        userName: Username,
+        userLoaction: Userloaction,
+        userOcupations: Useroccupation,
+        userQuvalification: Userqulification,
+        userDocuemtid: UsersDocID,
+        userImg: UserImg,
+        UsersDepartment: UsersDepartment,
+        UsersPassedYear: UsersPassedYear,
+          UsersrollNo:UsersrollNo
+      ),
+    ];
+
+
 
     return Scaffold(
       body:
-
+      //padding:  EdgeInsets.only(left: width/39.2,right: width/39.2),
       SafeArea(
-        child: Padding(
-          padding:  EdgeInsets.only(left: width/39.2,right: width/39.2),
-          child:SingleChildScrollView(
-              physics: ScrollPhysics(),
-              child:
-              bottomItemValue==0?
-              Home_Screen(Username: Username,):
-              bottomItemValue==1?
-               Member_Screen(
-                userLatitude: lat,
-                userLongtitude: lon,
-              ):
-              bottomItemValue==2?
-               Message_Screen(
-                UserDepartment: UsersDepartment,
-                UserPassedYear: UsersPassedYear,
-              )
-              :Profile_Page(
-                userName: Username,
-                userLoaction: Userloaction,
-                userOcupations: Useroccupation,
-                userQuvalification: Userqulification,
-                userDocuemtid: FirebaseAuth.instance.currentUser!.uid,
-                 userImg: UserImg,
-              ),
-          )
-
-        ),
+        child: SingleChildScrollView(
+          physics: const ScrollPhysics(),
+          child: Pages[bottomItemValue],
+        )
       ),
       bottomNavigationBar: Container(
-        height: height/13.3666,
+        height: height/11.4,
         color: Colors.white,
-        child:
-        Row(
+        child:BottomBarDivider(
+          animated: true,
+         styleDivider: StyleDivider.all,
+         duration: const Duration(milliseconds: 400),
+         curve: Curves.easeIn,
+         // visitHighlight: bottomItemValue,
+          items: const [
+           TabItem(
+             icon: Icons.home,
+             title: 'Home',
+           ),
+            TabItem(
+              icon: Icons.location_on,
+              title: "Near By"
+
+            ),
+            TabItem(
+              icon: Icons.mail_outlined,
+              title: "Messages"
+            ),
+            TabItem(
+              icon: Icons.person,
+              title: 'Me',
+            ),
+
+          ],
+          backgroundColor: Colors.white,
+          color: bottomItemUnSlectedColor,
+          indexSelected: bottomItemValue,
+         // backgroundSelected: buttoncolor,
+          enableShadow: true,
+          onTap: (int value){
+         setState(() {
+           bottomItemValue=value;
+         });
+         print(bottomItemValue);
+         print("++++++++++++++++++++++++++++++++++");
+          },
+
+          colorSelected: bottomItemSlectedColor,
+        ),
+      /*  Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             GestureDetector(
               onTap: (){
-                print(height);
-                print(width);
                 setState(() {
                   bottomItemValue=0;
                 });
+                controller.animateToPage(bottomItemValue, duration: Duration(milliseconds: 300), curve: Curves.linear);
+
               },
               child: Column(
                 children: [
@@ -120,13 +167,17 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
                 setState(() {
                   bottomItemValue=1;
                 });
+                controller.animateToPage(bottomItemValue, duration: Duration(milliseconds: 300), curve: Curves.linear);
               },
               child: Column(
                 children: [
-                  Image.asset(openBookImg,color:bottomItemValue==1?
-                  bottomItemSlectedColor:bottomItemUnSlectedColor,),
+
+                  Icon(Icons.location_on_sharp,color:bottomItemValue==1?
+                  bottomItemSlectedColor:bottomItemUnSlectedColor),
+                  // Image.asset(openBookImg,color:bottomItemValue==1?
+                  // bottomItemSlectedColor:bottomItemUnSlectedColor,),
                   KText(
-                    text:"Member",style: GoogleFonts.nunito(
+                    text:"Near By",style: GoogleFonts.nunito(
                       fontWeight: FontWeight.w700,
                       color: bottomItemValue==1?
                       bottomItemSlectedColor:bottomItemUnSlectedColor
@@ -140,6 +191,7 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
                 setState(() {
                   bottomItemValue=2;
                 });
+                controller.animateToPage(bottomItemValue, duration: Duration(milliseconds: 300), curve: Curves.linear);
               },
               child: Column(
                 children: [
@@ -161,6 +213,7 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
                 setState(() {
                   bottomItemValue=3;
                 });
+                controller.animateToPage(bottomItemValue, duration: Duration(milliseconds: 300), curve: Curves.linear);
               },
               child: Column(
                 children: [
@@ -178,7 +231,7 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
             ),
 
           ],
-        )
+        )*/
       ),
     );
   }
@@ -202,6 +255,8 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
        Useroccupation = Userdata.docs[0]["Occupation"].toString();
        UsersDepartment = Userdata.docs[0]["subjectStream"].toString();
        UsersPassedYear = Userdata.docs[0]["yearofpassed"].toString();
+       UsersrollNo = Userdata.docs[0]["rollNo"].toString();
+       UsersDocID=Userdata.docs[0].id;
        UserImg =Userdata.docs[0]["UserImg"].toString()==""?AvatorImg: Userdata.docs[0]["UserImg"].toString();
      });
 

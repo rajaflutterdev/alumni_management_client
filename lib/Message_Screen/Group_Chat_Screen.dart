@@ -1,11 +1,13 @@
 
 import "dart:convert";
+import "dart:math";
 
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "package:intl/intl.dart";
 import "package:http/http.dart" as http;
+import "package:lottie/lottie.dart";
 import "../Constant_File.dart";
 import "../Translator_Module/Translator_Module_Page.dart";
 
@@ -75,8 +77,9 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
                       width: width/7.84,
                       decoration: BoxDecoration(
                           color: Colors.grey,
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(width/13.66),
                           image: DecorationImage(
+                            fit: BoxFit.cover,
                             image: NetworkImage(widget.groupImg.toString()),
 
                           )
@@ -167,39 +170,44 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
                                 EdgeInsets.only(right: width/39.2):
                                 EdgeInsets.only(left: width/39.2),
                                 child: messagedata['From']=="Client"?
-                                Align(
-                                  alignment:  Alignment.topRight,
-                                  child: Material(
-                                    color: msgContentTextColor,
-                                    borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(12),
-                                        topRight: Radius.circular(5),
-                                        topLeft: Radius.circular(15)
-                                    ),
-                                    elevation:6,
-                                    child: Container(
-                                      decoration:  BoxDecoration(
-                                          color: msgContentTextColor,
-                                          borderRadius: const BorderRadius.only(
-                                              bottomLeft: Radius.circular(12),
-                                              topRight: Radius.circular(8),
-                                              topLeft: Radius.circular(8)
-                                          )
+                                GestureDetector(
+                                  onTap: (){
+                                    GroupChatpopup(messagedata.id);
+                                  },
+                                  child: Align(
+                                    alignment:  Alignment.topRight,
+                                    child: Material(
+                                      color: msgContentTextColor,
+                                      borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(12),
+                                          topRight: Radius.circular(5),
+                                          topLeft: Radius.circular(15)
                                       ),
-                                      padding: EdgeInsets.only(
-                                          top: height/75.9,
-                                          bottom: height/75.9,
-                                          left: width/39.2,
-                                          right: width/39.2
+                                      elevation:6,
+                                      child: Container(
+                                        decoration:  BoxDecoration(
+                                            color: msgContentTextColor,
+                                            borderRadius: const BorderRadius.only(
+                                                bottomLeft: Radius.circular(12),
+                                                topRight: Radius.circular(8),
+                                                topLeft: Radius.circular(8)
+                                            )
+                                        ),
+                                        padding: EdgeInsets.only(
+                                            top: height/75.9,
+                                            bottom: height/75.9,
+                                            left: width/39.2,
+                                            right: width/39.2
+                                        ),
+
+                                        child:  KText(
+                                          text:messagedata['Message'].toString(),
+                                          style:GoogleFonts.nunito(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            fontSize:width/24.5,),),
+
                                       ),
-
-                                      child:  KText(
-                                        text:messagedata['Message'].toString(),
-                                        style:GoogleFonts.nunito(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          fontSize:width/24.5,),),
-
                                     ),
                                   ),
                                 ):
@@ -307,13 +315,13 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
             child: Material(
               elevation:5,
               color: const Color(0xffFFFFFF),
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(width/3.6),
               child: Container(
-                height: height/15.7083,
+                height: height/16.6,
                 width: width/7.8,
                 decoration: BoxDecoration(
                     color: const Color(0xffFFFFFF),
-                    borderRadius: BorderRadius.circular(100)
+                    borderRadius: BorderRadius.circular(width/3.6)
                 ),
                 padding: EdgeInsets.symmetric
                   (
@@ -328,10 +336,17 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
       ),
     );
   }
-
-
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  }
   GroupmessageCreateFuntion() async {
-    FirebaseFirestore.instance.collection("Groups").doc(widget.Docid).collection("Messages").doc().set({
+
+    var documentID=generateRandomString(16).toString();
+
+
+    FirebaseFirestore.instance.collection("Groups").doc(widget.Docid).collection("Messages").doc(documentID).set({
       "Message": msgController.text,
       "time": DateFormat('hh:mm a').format(DateTime.now()),
       "timestamp": DateTime.now().millisecondsSinceEpoch,
@@ -347,7 +362,7 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
               body:msgController.text ,
               title: "${Userdata.docs[x]['subjectStream']}-${Userdata.docs[x]['yearofpassed']} New Message",
               token:Userdata.docs[x]['Token'].toString() );
-          FirebaseFirestore.instance.collection("Users").doc(Userdata.docs[x].id).collection("Groups").doc()
+          FirebaseFirestore.instance.collection("Users").doc(Userdata.docs[x].id).collection("Groups").doc(documentID)
               .set({
             "Message": msgController.text,
             "time": DateFormat('hh:mm a').format(DateTime.now()),
@@ -388,6 +403,123 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
     } catch (e) {
       print("error push notification");
     }
+  }
+
+
+   GroupChatpopup(DocId) async {
+
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return showDialog<void>(
+      context: context,
+
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Padding(
+            padding:  EdgeInsets.only(top:height/75.6),
+            child: KText(
+              text:"Are Your Want To Delete",
+              align:  TextAlign.center,
+              style:GoogleFonts.nunito(color: Colors.black,
+                  fontSize:width/22.5,
+                  fontWeight: FontWeight.w800
+              ),
+            ),
+          ),
+          content: SizedBox(
+            height: height / 3.0,
+            child: Column(
+              children: [
+                SizedBox(height: height/25.609,),
+
+                SizedBox(
+                  height: height/6.0,
+                  width: width/2.4,
+
+                  child: Lottie.asset(DeleteAnimation),
+                ),
+                SizedBox(height: height/25.609,),
+
+                Padding(
+                  padding: EdgeInsets.only(left: width / 45),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      GestureDetector(
+                        onTap: (){
+                          deleteGroupMessage(DocId);
+                        },
+                        child: Container(
+
+                          height: height/21.0,
+                          width: width/4.8,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: buttoncolor
+                          ),
+                          child: Center(
+                            child: KText(
+                              text: "Yes",
+                              style: GoogleFonts.nunito(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: width / 25,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+
+                          height: height/21.0,
+                          width: width/4.8,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color:  Colors.red),
+                          child: Center(
+                            child: KText(
+                              text: "NO",
+                              style: GoogleFonts.nunito(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: width / 25,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          alignment: Alignment.center,
+          actionsAlignment: MainAxisAlignment.center,
+          titlePadding: EdgeInsets.symmetric(
+              horizontal: width / 45, vertical: height / 94.5),
+        );
+      },
+    );
+  }
+
+  deleteGroupMessage(documentid) async {
+    FirebaseFirestore.instance.collection("Groups").doc(widget.Docid).collection("Messages").doc(documentid).delete();
+    var Userdata=await FirebaseFirestore.instance.collection("Users").get();
+    for(int x=0;x<Userdata.docs.length;x++){
+      if(Userdata.docs[x]['subjectStream']==widget.groupdepart){
+        if(Userdata.docs[x]['yearofpassed']==widget.grouppassesyear){
+          FirebaseFirestore.instance.collection("Users").doc(Userdata.docs[x].id).collection("Groups").doc(documentid)
+              .delete();
+        }
+      }
+    }
+
+    Navigator.pop(context);
   }
 
 }

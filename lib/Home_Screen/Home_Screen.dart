@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import '../About_Page/About_Page.dart';
 import '../Authndication_Pages/Login_Screen.dart';
 import '../Slders_screen/Slider_Screen.dart';
 import '../Translator_Module/Translator_Module_Page.dart';
@@ -14,7 +15,8 @@ import '../Translator_Module/Translator_Module_Page.dart';
 
 class Home_Screen extends StatefulWidget {
   String?Username;
-   Home_Screen({this.Username});
+  String?UserAuthID;
+   Home_Screen({this.Username,this.UserAuthID});
 
   @override
   State<Home_Screen> createState() => _Home_ScreenState();
@@ -26,6 +28,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   @override
   void initState() {
     tabController=TabController(length: 3, vsync: this)  ;
+    registerUserfunc();
     // TODO: implement initState
     super.initState();
   }
@@ -33,148 +36,315 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   TabController?tabController;
   int selectTabIndex=0;
 
+  List registerEventsList=[];
+
+  List <regsiterUser> previousregisterEventsList=[];
+
+
+  registerUserfunc() async {
+    setState(() {
+      previousregisterEventsList.clear();
+    });
+    var registerUserData=await FirebaseFirestore.instance.collection("Batch_events").orderBy("timestamp").get();
+
+    for(int x=0;x<registerUserData.docs.length;x++){
+      for(int  j=0;j<registerUserData.docs[x]['registeredUsers'].length;j++){
+        setState(() {
+          previousregisterEventsList.add(
+            regsiterUser(
+              StreamDocID:registerUserData.docs[x].id ,
+              UserId: registerUserData.docs[x]['registeredUsers'][j]
+            )
+          );
+        });
+      }
+    }
+    print(previousregisterEventsList.first.UserId);
+    print(previousregisterEventsList.first.StreamDocID);
+    print("DynamicListss++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  }
+
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
-    return   Column(
-      children: [
-        Padding(
-          padding:  EdgeInsets.only(top: height/40.1),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return   Padding(
+      padding:  EdgeInsets.only(left: width/39.2,right: width/39.2),
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            Padding(
+              padding:  EdgeInsets.only(top: height/40.1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                         "${landingQuote1} ${widget.Username.toString()}👋",style: GoogleFonts.nunito(
+                          fontSize: width/16.6,
+                          fontWeight: FontWeight.w700),),
+                      SizedBox(
+                        width:width/1.3,
+                        child: FittedBox(
+                          child: KText(
+                            text:"${landingQuote2}",style: GoogleFonts.nunito(
+                              fontSize: width/22.5,
+                              fontWeight: FontWeight.w700),),
+                        ),
+                      ),
+                    ],
+                  ),
+        
                   GestureDetector(
                     onTap: (){
-                      print(height);
-                      print(width);
+                      showMenuList(context);
                     },
-                    child: KText(
-                      text: "${landingQuote1} ${widget.Username.toString()}👋",style: GoogleFonts.nunito(
-                        fontSize: width/16.6,
-                        fontWeight: FontWeight.w700),),
-                  ),
-                  SizedBox(
-                    width:width/1.3,
-                    child: FittedBox(
-                      child: KText(
-                        text:"${landingQuote2}",style: GoogleFonts.nunito(
-                          fontSize: width/22.5,
-                          fontWeight: FontWeight.w700),),
-                    ),
-                  ),
-                ],
-              ),
-
-              GestureDetector(
-                onTap: (){
-                  showMenuList(context);
-                },
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(5),
-                  color: buttoncolor,
-                  child: Container(
-                    height: height/20.05,
-                    width: width/9.8,
-                    decoration: BoxDecoration(
+                    child: Material(
+                      elevation: 5,
                       borderRadius: BorderRadius.circular(5),
                       color: buttoncolor,
+                      child: Container(
+                        height: height/20.05,
+                        width: width/9.8,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: buttoncolor,
+                        ),
+                        child: const Icon(Icons.settings,color: Colors.white,),
+                      ),
                     ),
-                    child: const Icon(Icons.settings,color: Colors.white,),
-                  ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: height/53.466,),
+            SizedBox(
+              height: height / 5.0,
+              width: width/1.0888,
+              child: Slider_Screen(),
+            ),
+            SizedBox(height: height/53.466,),
+            TabBar(
+              controller: tabController,
+              labelColor: Colors.black,
+              dividerColor: Colors.transparent,
+              isScrollable: false,
+              indicatorSize: TabBarIndicatorSize.label,
+              indicatorColor: buttoncolor,
+              physics: const BouncingScrollPhysics(),
+              indicatorPadding: const EdgeInsets.symmetric(
+                  horizontal: 0, vertical: 0),
+              labelPadding: const EdgeInsets.all(0),
+              splashBorderRadius: BorderRadius.zero,
+              splashFactory: NoSplash.splashFactory,
+              labelStyle: GoogleFonts.nunito(
+                fontSize: width/25.714,
+                fontWeight: FontWeight.w800,
+              ),
+              unselectedLabelStyle: GoogleFonts.nunito(
+                  color: const Color(0xff4E4B66)
+              ),
+              onTap: (index){
+                setState(() {
+                  selectTabIndex = index;
+                });
+              },
+              tabs: [
+                Tab(
+                  child:    KText(
+                      text:"Collage Activities",style:GoogleFonts.nunito(
+                    fontWeight: FontWeight.w600
+                  )),
                 ),
-              )
-            ],
-          ),
-        ),
-        SizedBox(height: height/53.466,),
-        SizedBox(
-          height: height / 5.0,
-          width: width/1.0888,
-          child: Slider_Screen(),
-        ),
-        SizedBox(height: height/53.466,),
-        TabBar(
-          controller: tabController,
-          labelColor: Colors.black,
-          dividerColor: Colors.transparent,
-          isScrollable: false,
-          indicatorSize: TabBarIndicatorSize.label,
-          indicatorColor: buttoncolor,
-          physics: const BouncingScrollPhysics(),
-          indicatorPadding: const EdgeInsets.symmetric(
-              horizontal: 0, vertical: 0),
-          labelPadding: const EdgeInsets.all(0),
-          splashBorderRadius: BorderRadius.zero,
-          splashFactory: NoSplash.splashFactory,
-          labelStyle: GoogleFonts.nunito(
-            fontSize: width/25.714,
-            fontWeight: FontWeight.w800,
-          ),
-          unselectedLabelStyle: GoogleFonts.nunito(
-              color: const Color(0xff4E4B66)
-          ),
-          onTap: (index){
-            setState(() {
-              selectTabIndex = index;
-            });
-          },
-          tabs: [
-            Tab(
-              child:    KText(
-                  text:"Collage Activities",style:GoogleFonts.nunito(
-                fontWeight: FontWeight.w600
-              )),
+                Tab(
+                  child:   KText(
+                      text:"Batch Events",style:GoogleFonts.nunito( fontWeight: FontWeight.w600)),
+                ),
+                Tab(
+                  child:   KText(
+                      text:"Job Posts",style:GoogleFonts.nunito( fontWeight: FontWeight.w600)),
+                ),
+              ],
             ),
-            Tab(
-              child:   KText(
-                  text:"Batch Events",style:GoogleFonts.nunito( fontWeight: FontWeight.w600)),
-            ),
-            Tab(
-              child:   KText(
-                  text:"Job Posts",style:GoogleFonts.nunito( fontWeight: FontWeight.w600)),
-            ),
-          ],
-        ),
-        SizedBox(
-          height:height/1.008,
-          child: TabBarView(
-            controller: tabController,
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-
-              ///College activities Stream Builder
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("ColleageActivities")
-                      .orderBy("timestamp").snapshots(),
-                builder:(context, snapshot) {
-                    
-                    if(!snapshot.hasData){
-                      return const Center(child: CircularProgressIndicator(),);
-                    }
-                    if(snapshot.hasData==null){
-                      return const Center(child: CircularProgressIndicator(),);
-                    }
-
-                    return ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        var clgActivitied=snapshot.data!.docs[index];
-                        return
-                          GestureDetector(
+            SizedBox(
+              height:height/1.008,
+              child: TabBarView(
+                controller: tabController,
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+        
+                  ///College activities Stream Builder
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection("ColleageActivities")
+                          .orderBy("timestamp").snapshots(),
+                    builder:(context, snapshot) {
+        
+                        if(!snapshot.hasData){
+                          return const Center(child: CircularProgressIndicator(),);
+                        }
+                        if(snapshot.hasData==null){
+                          return const Center(child: CircularProgressIndicator(),);
+                        }
+        
+                        return ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            var clgActivitied=snapshot.data!.docs[index];
+                            return
+                              GestureDetector(
+                                onTap:(){
+                                  streamDetailsPopup(
+                                    contentImg:clgActivitied['img'],
+                                    contentTime: clgActivitied['uploadTime'],
+                                    contentSubtitle: clgActivitied['subtitle'],
+                                    contentTitle: clgActivitied['title'],
+                                    StreamName: "College Activities",
+                                    contectDocID: clgActivitied.id
+                                  );
+                                },
+                                child: Material(
+                                  elevation:15,
+                                  color: Color(0xffFFFFFF),
+                                  //color: Colors.red,
+                                  shadowColor: Colors.black12,
+                                  child: Container(
+                                      height: height/8.02,
+                                      width:double.infinity,
+                                      decoration: BoxDecoration(
+                                          color:Color(0xffFFFFFF),
+                                          // color: Colors.red,
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey.shade300
+                                              )
+                                          )
+                                      ),
+                                      child:Padding(
+                                        padding:  EdgeInsets.symmetric(
+                                            horizontal: width/49,
+                                            vertical: height/100.25
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: height/10.6933,
+                                              width: width/5.226,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade200,
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  image: DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                      image: NetworkImage(clgActivitied['img'].toString())
+                                                  )
+                                              ),
+                                            ),
+        
+                                            Padding(
+                                              padding:  EdgeInsets.only(left:width/49),
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height: height/40.1,
+                                                    child:  KText(
+                                                      text:clgActivitied['title'].toString(),
+                                                      style: GoogleFonts.nunito(
+                                                          fontSize: width/30.153,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: ItemTitleColor,
+                                                          textStyle: TextStyle(
+                                                              overflow: TextOverflow.ellipsis
+                                                          )
+                                                      ),),
+                                                  ),
+        
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height:height/19.095,
+                                                    child:  KText(
+                                                      text:clgActivitied['subtitle'].toString(),
+                                                      style: GoogleFonts.nunito(
+                                                          fontSize: width/28,
+                                                          fontWeight: FontWeight.w700,
+                                                          textStyle: TextStyle(
+                                                            //  overflow: TextOverflow.ellipsis,
+                                                          )
+                                                      ),),
+                                                  ),
+        
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height: height/40.1,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
+                                                        Padding(
+                                                          padding:  EdgeInsets.only(left: width/196),
+                                                          child:  KText(
+                                                            text:
+                                                              clgActivitied['uploadTime'].toString(),
+                                                            style: GoogleFonts.nunito(
+                                                                fontSize: width/30.153,
+                                                                fontWeight: FontWeight.w700,
+                                                                color: ItemTitleColor,
+                                                                textStyle: TextStyle(
+                                                                    overflow: TextOverflow.ellipsis
+                                                                )
+                                                            ),),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+        
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                  ),
+                                ),
+                              );
+                          },
+        
+                        );
+                      }, ),
+        
+                  ///Batch Events
+        
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance.collection("Batch_events")
+                        .orderBy("timestamp").snapshots(),
+                    builder:(context, snapshot) {
+        
+                      if(!snapshot.hasData){
+                        return const Center(child: CircularProgressIndicator(),);
+                      }
+                      if(snapshot.hasData==null){
+                        return const Center(child: CircularProgressIndicator(),);
+                      }
+        
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+        
+                          var clgActivitied=snapshot.data!.docs[index];
+                          return  GestureDetector(
                             onTap:(){
                               streamDetailsPopup(
-                                contentImg:clgActivitied['img'],
-                                contentTime: clgActivitied['uploadTime'],
-                                contentSubtitle: clgActivitied['subtitle'],
-                                contentTitle: clgActivitied['title'],
-                                StreamName: "College Activities"
+                                  contentImg:clgActivitied['img'],
+                                  contentTime: clgActivitied['uploadTime'],
+                                  contentSubtitle: clgActivitied['subtitle'],
+                                  contentTitle: clgActivitied['title'],
+                                  StreamName: "Batch Events",
+                                  contectDocID: clgActivitied.id
                               );
                             },
                             child: Material(
@@ -202,7 +372,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                     child: Row(
                                       children: [
                                         Container(
-                                          height: height/10.6933,
+                                         height: height/10.6933,
                                           width: width/5.226,
                                           decoration: BoxDecoration(
                                               color: Colors.grey.shade200,
@@ -213,13 +383,12 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                               )
                                           ),
                                         ),
-
                                         Padding(
                                           padding:  EdgeInsets.only(left:width/49),
                                           child: Column(
                                             children: [
                                               SizedBox(
-                                                width: width/1.6333,
+                                               width: width/1.6333,
                                                 height: height/40.1,
                                                 child:  KText(
                                                   text:clgActivitied['title'].toString(),
@@ -232,9 +401,9 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                                       )
                                                   ),),
                                               ),
-
+        
                                               SizedBox(
-                                                width: width/1.6333,
+                                               width: width/1.6333,
                                                 height:height/19.095,
                                                 child:  KText(
                                                   text:clgActivitied['subtitle'].toString(),
@@ -246,9 +415,9 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                                       )
                                                   ),),
                                               ),
-
+        
                                               SizedBox(
-                                                width: width/1.6333,
+                                               width: width/1.6333,
                                                 height: height/40.1,
                                                 child: Row(
                                                   children: [
@@ -256,8 +425,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                                     Padding(
                                                       padding:  EdgeInsets.only(left: width/196),
                                                       child:  KText(
-                                                        text:
-                                                          clgActivitied['uploadTime'].toString(),
+                                                        text:clgActivitied['uploadTime'].toString(),
                                                         style: GoogleFonts.nunito(
                                                             fontSize: width/30.153,
                                                             fontWeight: FontWeight.w700,
@@ -270,7 +438,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                                                   ],
                                                 ),
                                               ),
-
+        
                                             ],
                                           ),
                                         )
@@ -280,291 +448,156 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                               ),
                             ),
                           );
-                      },
-                      
-                    );
-                  }, ),
-
-              ///Batch Events
-
-              StreamBuilder(
-                stream: FirebaseFirestore.instance.collection("Batch_events")
-                    .orderBy("timestamp").snapshots(),
-                builder:(context, snapshot) {
-
-                  if(!snapshot.hasData){
-                    return const Center(child: CircularProgressIndicator(),);
-                  }
-                  if(snapshot.hasData==null){
-                    return const Center(child: CircularProgressIndicator(),);
-                  }
-
-                  return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-
-                      var clgActivitied=snapshot.data!.docs[index];
-
-                      return  GestureDetector(
-                        onTap:(){
-                          streamDetailsPopup(
-                              contentImg:clgActivitied['img'],
-                              contentTime: clgActivitied['uploadTime'],
-                              contentSubtitle: clgActivitied['subtitle'],
-                              contentTitle: clgActivitied['title'],
-                              StreamName: "Batch Events"
-                          );
                         },
-                        child: Material(
-                          elevation:15,
-                          color: Color(0xffFFFFFF),
-                          //color: Colors.red,
-                          shadowColor: Colors.black12,
-                          child: Container(
-                              height: height/8.02,
-                              width:double.infinity,
-                              decoration: BoxDecoration(
-                                  color:Color(0xffFFFFFF),
-                                  // color: Colors.red,
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.grey.shade300
+        
+                      );
+                    }, ),
+        
+                  ///Job Posts Stream
+        
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance.collection("JobPosts")
+                        .orderBy("timestamp").snapshots(),
+                    builder:(context, snapshot) {
+        
+                      if(!snapshot.hasData){
+                        return const Center(child: CircularProgressIndicator(),);
+                      }
+                      if(snapshot.hasData==null){
+                        return const Center(child: CircularProgressIndicator(),);
+                      }
+        
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          var clgActivitied=snapshot.data!.docs[index];
+                          return  GestureDetector(
+                            onTap:(){
+                              streamDetailsPopup(
+                                  contentImg:clgActivitied['img'],
+                                  contentTime: clgActivitied['uploadTime'],
+                                  contentSubtitle: clgActivitied['subtitle'],
+                                  contentTitle: clgActivitied['title'],
+                                  StreamName: "Job Posts",
+                                  contectDocID: clgActivitied.id
+                              );
+                            },
+                            child: Material(
+                              elevation:15,
+                              color: Color(0xffFFFFFF),
+                              //color: Colors.red,
+                              shadowColor: Colors.black12,
+                              child: Container(
+                                  height: height/8.02,
+                                  width:double.infinity,
+                                  decoration: BoxDecoration(
+                                      color:Color(0xffFFFFFF),
+                                      // color: Colors.red,
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: Colors.grey.shade300
+                                          )
                                       )
+                                  ),
+                                  child:Padding(
+                                    padding:  EdgeInsets.symmetric(
+                                        horizontal: width/49,
+                                        vertical: height/100.25
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                         height: height/10.6933,
+                                          width: width/5.226,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey.shade200,
+                                              borderRadius: BorderRadius.circular(5),
+                                              image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                  image: NetworkImage(clgActivitied['img'].toString())
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:  EdgeInsets.only(left:width/49),
+                                          child: Column(
+                                            children: [
+                                              SizedBox(
+                                               width: width/1.6333,
+                                                height: height/40.1,
+                                                child:  KText(
+                                                  text:clgActivitied['title'].toString(),
+                                                  style: GoogleFonts.nunito(
+                                                      fontSize: width/30.153,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: ItemTitleColor,
+                                                      textStyle: const TextStyle(
+                                                          overflow: TextOverflow.ellipsis
+                                                      )
+                                                  ),),
+                                              ),
+        
+                                              SizedBox(
+                                               width: width/1.6333,
+                                                height:height/19.095,
+                                                child:  KText(
+                                                  text:clgActivitied['subtitle'].toString(),
+                                                  style: GoogleFonts.nunito(
+                                                      fontSize: width/28,
+                                                      fontWeight: FontWeight.w700,
+                                                      textStyle: const TextStyle(
+                                                        //  overflow: TextOverflow.ellipsis,
+                                                      )
+                                                  ),),
+                                              ),
+        
+                                              SizedBox(
+                                               width: width/1.6333,
+                                                height: height/40.1,
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
+                                                    Padding(
+                                                      padding:  EdgeInsets.only(left: width/196),
+                                                      child:  KText(
+                                                        text:clgActivitied['uploadTime'].toString(),
+                                                        style: GoogleFonts.nunito(
+                                                            fontSize: width/30.153,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: ItemTitleColor,
+                                                            textStyle: const TextStyle(
+                                                                overflow: TextOverflow.ellipsis
+                                                            )
+                                                        ),),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+        
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   )
                               ),
-                              child:Padding(
-                                padding:  EdgeInsets.symmetric(
-                                    horizontal: width/49,
-                                    vertical: height/100.25
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                     height: height/10.6933,
-                                      width: width/5.226,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-                                          borderRadius: BorderRadius.circular(5),
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                              image: NetworkImage(clgActivitied['img'].toString())
-                                          )
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:  EdgeInsets.only(left:width/49),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height: height/40.1,
-                                            child:  KText(
-                                              text:clgActivitied['title'].toString(),
-                                              style: GoogleFonts.nunito(
-                                                  fontSize: width/30.153,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: ItemTitleColor,
-                                                  textStyle: TextStyle(
-                                                      overflow: TextOverflow.ellipsis
-                                                  )
-                                              ),),
-                                          ),
-
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height:height/19.095,
-                                            child:  KText(
-                                              text:clgActivitied['subtitle'].toString(),
-                                              style: GoogleFonts.nunito(
-                                                  fontSize: width/28,
-                                                  fontWeight: FontWeight.w700,
-                                                  textStyle: TextStyle(
-                                                    //  overflow: TextOverflow.ellipsis,
-                                                  )
-                                              ),),
-                                          ),
-
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height: height/40.1,
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
-                                                Padding(
-                                                  padding:  EdgeInsets.only(left: width/196),
-                                                  child:  KText(
-                                                    text:clgActivitied['uploadTime'].toString(),
-                                                    style: GoogleFonts.nunito(
-                                                        fontSize: width/30.153,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: ItemTitleColor,
-                                                        textStyle: TextStyle(
-                                                            overflow: TextOverflow.ellipsis
-                                                        )
-                                                    ),),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                          ),
-                        ),
-                      );
-                    },
-
-                  );
-                }, ),
-
-              ///Job Posts Stream
-
-              StreamBuilder(
-                stream: FirebaseFirestore.instance.collection("JobPosts")
-                    .orderBy("timestamp").snapshots(),
-                builder:(context, snapshot) {
-
-                  if(!snapshot.hasData){
-                    return const Center(child: CircularProgressIndicator(),);
-                  }
-                  if(snapshot.hasData==null){
-                    return const Center(child: CircularProgressIndicator(),);
-                  }
-
-                  return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var clgActivitied=snapshot.data!.docs[index];
-                      return  GestureDetector(
-                        onTap:(){
-                          streamDetailsPopup(
-                              contentImg:clgActivitied['img'],
-                              contentTime: clgActivitied['uploadTime'],
-                              contentSubtitle: clgActivitied['subtitle'],
-                              contentTitle: clgActivitied['title'],
-                              StreamName: "Job Posts"
+                            ),
                           );
                         },
-                        child: Material(
-                          elevation:15,
-                          color: Color(0xffFFFFFF),
-                          //color: Colors.red,
-                          shadowColor: Colors.black12,
-                          child: Container(
-                              height: height/8.02,
-                              width:double.infinity,
-                              decoration: BoxDecoration(
-                                  color:Color(0xffFFFFFF),
-                                  // color: Colors.red,
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.grey.shade300
-                                      )
-                                  )
-                              ),
-                              child:Padding(
-                                padding:  EdgeInsets.symmetric(
-                                    horizontal: width/49,
-                                    vertical: height/100.25
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                     height: height/10.6933,
-                                      width: width/5.226,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-                                          borderRadius: BorderRadius.circular(5),
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                              image: NetworkImage(clgActivitied['img'].toString())
-                                          )
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:  EdgeInsets.only(left:width/49),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height: height/40.1,
-                                            child:  KText(
-                                              text:clgActivitied['title'].toString(),
-                                              style: GoogleFonts.nunito(
-                                                  fontSize: width/30.153,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: ItemTitleColor,
-                                                  textStyle: const TextStyle(
-                                                      overflow: TextOverflow.ellipsis
-                                                  )
-                                              ),),
-                                          ),
-
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height:height/19.095,
-                                            child:  KText(
-                                              text:clgActivitied['subtitle'].toString(),
-                                              style: GoogleFonts.nunito(
-                                                  fontSize: width/28,
-                                                  fontWeight: FontWeight.w700,
-                                                  textStyle: const TextStyle(
-                                                    //  overflow: TextOverflow.ellipsis,
-                                                  )
-                                              ),),
-                                          ),
-
-                                          SizedBox(
-                                           width: width/1.6333,
-                                            height: height/40.1,
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
-                                                Padding(
-                                                  padding:  EdgeInsets.only(left: width/196),
-                                                  child:  KText(
-                                                    text:clgActivitied['uploadTime'].toString(),
-                                                    style: GoogleFonts.nunito(
-                                                        fontSize: width/30.153,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: ItemTitleColor,
-                                                        textStyle: const TextStyle(
-                                                            overflow: TextOverflow.ellipsis
-                                                        )
-                                                    ),),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                          ),
-                        ),
+        
                       );
-                    },
-
-                  );
-                }, ),
-
-            ],
-          ),
+                    }, ),
+        
+                ],
+              ),
+            ),
+            SizedBox(height: height/32.08,),
+        
+          ],
         ),
-        SizedBox(height: height/32.08,),
-
-      ],
+      ),
     );
   }
 
@@ -619,6 +652,9 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
            textStyle: GoogleFonts.nunito(
              fontWeight: FontWeight.w700,
            ),
+          onTap: (){
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const About_Page(),));
+          },
           value: 2,
           child:  KText(
             text:
@@ -654,9 +690,24 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   }
 
 
+  streamDetailsPopup({contentImg,contentTitle,contentSubtitle,contentTime,StreamName,contectDocID}){
+
+    bool registered=false;
+    setState(() {
+    registerEventsList.clear();
+    registered=false;
+    });
 
 
-  streamDetailsPopup({contentImg,contentTitle,contentSubtitle,contentTime,StreamName}){
+    previousregisterEventsList.forEach((element) {
+      if(element.StreamDocID==contectDocID){
+        if(element.UserId==widget.UserAuthID){
+          setState(() {
+            registered=true;
+          });
+        }
+      }
+    });
 
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
@@ -725,8 +776,95 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                       style: GoogleFonts.nunito(fontWeight:
                       FontWeight.w700,color: textcolor,fontSize: width/32.666),),
                   ),
+                  StreamName=="Batch Events"&&
+                      registered==true?
+                  GestureDetector(
+                   onTap: (){
+                     Navigator.pop(context);
+                   },
+                    child: Material(
+                      elevation: 5,
+                      shadowColor: Colors.indigo,
+                      borderRadius: BorderRadius.circular(5),
+                      color: buttoncolor,
+                      child: Container(
+                        height:height/20.05,
+                        width: width/1.2,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: buttoncolor,
+                        ),
+                        child: Center(
+                          child:  KText(text:" Your Already Register this Events",
+                            style: GoogleFonts.nunito(fontWeight:
+                            FontWeight.w800,color: Colors.white,fontSize: width/28.666),),
+                        ),
+
+                      ),
+                    ),
+                  ):
+                  StreamName=="Batch Events"?
                   GestureDetector(
                     onTap: (){
+                      registerEventsList.add(widget.UserAuthID.toString());
+                      FirebaseFirestore.instance.collection("Batch_events").doc(contectDocID).update({
+                        "registeredUsers":registerEventsList
+                      });
+                      registerUserfunc();
+                      Navigator.pop(context);
+                      registerSuccessFullpopup();
+
+                    },
+                    child: Material(
+                      elevation: 5,
+                      shadowColor: Colors.indigo,
+                      borderRadius: BorderRadius.circular(55),
+                      color: buttoncolor,
+                      child: Container(
+                        height:height/20.05,
+                        width: width/3.2666,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(55),
+                          color: buttoncolor,
+                        ),
+                        child: Center(
+                          child:  KText(text:"Book Events",
+                            style: GoogleFonts.nunito(fontWeight:
+                            FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
+                        ),
+
+                      ),
+                    ),
+                  ):
+                  StreamName=="Job Posts"?
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Material(
+                      elevation: 5,
+                      shadowColor: Colors.indigo,
+                      borderRadius: BorderRadius.circular(55),
+                      color: buttoncolor,
+                      child: Container(
+                        height:height/20.05,
+                        width: width/3.2666,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(55),
+                          color: buttoncolor,
+                        ),
+                        child: Center(
+                          child:  KText(text:"View Post",
+                            style: GoogleFonts.nunito(fontWeight:
+                            FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
+                        ),
+
+                      ),
+                    ),
+                  ):
+                  GestureDetector(
+                    onTap: (){
+
                       Navigator.pop(context);
                     },
                     child: Material(
@@ -826,4 +964,81 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
       },
     );
   }
+
+
+  registerSuccessFullpopup() async {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Padding(
+            padding:  EdgeInsets.only(top:15),
+            child: KText(
+              text:"Register Submitted Successfully...",
+              align:  TextAlign.center,
+              style: GoogleFonts.nunito(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                fontSize: width / 23,
+              ),
+            ),
+          ),
+          content: SizedBox(
+            height: height / 3.8,
+            child: Column(
+              children: [
+                Container(
+                    height: height/5.2,
+                    color:Colors.transparent,
+                    child:Lottie.asset(successLottie)),
+                Padding(
+                  padding: EdgeInsets.only(left: width / 45,top:height/86.6),
+                  child: GestureDetector(
+                    onTap: (){
+                    Navigator.pop(context);
+                    },
+                    child: Container(
+
+                      height: height/24.0,
+                      width: width/5.5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: buttoncolor,
+                      ),
+                      child: Center(
+                        child: KText(
+                          text: "Okay",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: width / 26,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          alignment: Alignment.center,
+          actionsAlignment: MainAxisAlignment.center,
+          titlePadding: EdgeInsets.symmetric(
+              horizontal: width / 45, vertical: height / 94.5),
+        );
+      },
+    );
+  }
+
+
+}
+
+class regsiterUser{
+
+  String ?UserId;
+  String?StreamDocID;
+  regsiterUser({this.StreamDocID,this.UserId});
+
 }
