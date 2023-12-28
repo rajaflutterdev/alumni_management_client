@@ -54,7 +54,7 @@ class _Member_ScreenState extends State<Member_Screen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   KText(
-                    text: "Near By",
+                    text: "Near By Batch mates",
                     style: GoogleFonts.nunito(
                         fontSize: width / 19.6, fontWeight: FontWeight.w700),
                   ),

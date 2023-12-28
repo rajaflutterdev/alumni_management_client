@@ -11,7 +11,7 @@ Color bottomItemUnSlectedColor=Color(0xff515960);
 String SplashScreenImg="assets/SplshScrren.png";
 String LogOutLottie="assets/Signout (1).json";
 
-String profileBakcground='assets/New.png';
+String profileBakcground='assets/Rectangle 49.png';
 String AvatorImg="https://firebasestorage.googleapis.com/v0/b/alumni-management-b7491.appspot.com/o/147131-removebg-preview.png?alt=media&token=c7ac458c-4cf4-402b-bb83-6640d63d6953";
 
 ///otp Screen
@@ -20,7 +20,7 @@ String lottieOtpWaiting='assets/otpwaiting (New).json';
 ///Landing Screen
 Color ItemTitleColor=Color(0xff515960);
 
-
+String UserPassedYear='';
 /// Messing Screen
 
 String sendImg="assets/messageIcons2.png";
@@ -53,6 +53,8 @@ String PopUpImag="assets/PopUpImg.png";
 String landingQuote1="Hi";
 String landingQuote2="Let’s connect with your friends!";
 
+String errorLottie="assets/error.json";
+
 
 
 String Logo="assets/Vector 4089.png";
@@ -82,3 +84,6 @@ String DeleteAnimation="assets/delete animation app lottie.json";
 
 /// HOme Screen
  String successLottie="assets/Succees Full Lottie.json";
+
+
+ String DocuemntImg='assets/Document Icons.png';

@@ -427,39 +427,48 @@ class _Profile_PageState extends State<Profile_Page> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-
                 GestureDetector(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>Your_Post_Screen(),));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>Your_Post_Screen(
+                      AuthID: widget.userDocuemtid,
+                    ),));
                   },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: width / 25, right: width / 45,
-                        top: height / 94.5, bottom: height / 94.5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          child: Row(
-                            children: [
-                              Icon(Icons.person,
-                                color: TextColor,
-                                size: width/18,),
-                              SizedBox(width: width / 22,),
+                  child: Container(
+                    color: Colors.white,
+                    height: height/15.12,
+                    width: double.infinity,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: width / 25, right: width / 45,
+                          top: height / 94.5, bottom: height / 94.5),
+                      child: GestureDetector(
 
-                              KText(text:"Your Job Posts",
-                                style: GoogleFonts.nunito(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              child: Row(
+                                children: [
+                                  Icon(Icons.person,
                                     color: TextColor,
-                                    fontSize:width/25.69,
-                                    fontWeight: FontWeight.w500
+                                    size: width/18,),
+                                  SizedBox(width: width / 22,),
 
-                                ),),
-                            ],
-                          ),
+                                  KText(text:"Your Job Posts",
+                                    style: GoogleFonts.nunito(
+                                        color: TextColor,
+                                        fontSize:width/25.69,
+                                        fontWeight: FontWeight.w500
+
+                                    ),),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_ios, color: Colors.black,
+                              size: width/18,),
+                          ],
                         ),
-                        Icon(Icons.arrow_forward_ios, color: Colors.black,
-                          size: width/18,),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -468,37 +477,42 @@ class _Profile_PageState extends State<Profile_Page> {
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const Notification_screen(),));
                   },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: width / 25, right: width / 45,
-                        top: height / 94.5, bottom: height / 94.5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.notifications, color: Colors.black,
-                                size: width/18,),
+                  child: Container(
+                    color: Colors.white,
+                    height: height/15.12,
+                    width: double.infinity,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: width / 25, right: width / 45,
+                          top: height / 94.5, bottom: height / 94.5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.notifications, color: Colors.black,
+                                  size: width/18,),
 
-                              SizedBox(width: width / 22,),
+                                SizedBox(width: width / 22,),
 
-                              KText(
-                                text:
-                                "Notifications", style: GoogleFonts.nunito(
-                                  color: TextColor,
-                                  fontSize:width/25.69,
-                                  fontWeight: FontWeight.w500
+                                KText(
+                                  text:
+                                  "Notifications", style: GoogleFonts.nunito(
+                                    color: TextColor,
+                                    fontSize:width/25.69,
+                                    fontWeight: FontWeight.w500
 
-                              ),),
-                            ],
+                                ),),
+                              ],
+                            ),
                           ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, color: Colors.black,
-                          size: width/18,),
+                          Icon(Icons.arrow_forward_ios, color: Colors.black,
+                            size: width/18,),
 
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -507,39 +521,44 @@ class _Profile_PageState extends State<Profile_Page> {
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context) =>Languages_Page() ,));
                   },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: width / 25, right: width / 45,
-                        top: height / 94.5, bottom: height / 94.5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: width/1.8,
-                          child: Row(
-                            children: [
-                              Icon(Icons.translate_rounded, color: Colors.black,
-                                size: width/18,),
-                              SizedBox(width: width / 22,),
+                  child: Container(
+                    color: Colors.white,
+                    height: height/15.12,
+                    width: double.infinity,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: width / 25, right: width / 45,
+                          top: height / 94.5, bottom: height / 94.5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: width/1.8,
+                            child: Row(
+                              children: [
+                                Icon(Icons.translate_rounded, color: Colors.black,
+                                  size: width/18,),
+                                SizedBox(width: width / 22,),
 
-                              KText(text: "Language", style: GoogleFonts.nunito(
-                                  color: TextColor,
-                                  fontSize:width/25.69,
-                                  fontWeight: FontWeight.w500
+                                KText(text: "Language", style: GoogleFonts.nunito(
+                                    color: TextColor,
+                                    fontSize:width/25.69,
+                                    fontWeight: FontWeight.w500
 
-                              ),),
-                            ],
+                                ),),
+                              ],
+                            ),
                           ),
-                        ),
-                        KText(text:languaeName, style: GoogleFonts.nunito(
-                            color: buttoncolor,
-                            fontSize:width/25.69,
-                            fontWeight: FontWeight.w800
+                          KText(text:languaeName, style: GoogleFonts.nunito(
+                              color: buttoncolor,
+                              fontSize:width/25.69,
+                              fontWeight: FontWeight.w800
 
-                        ),),
-                        Icon(Icons.arrow_forward_ios, color: Colors.black,
-                          size: width/18,),
-                      ],
+                          ),),
+                          Icon(Icons.arrow_forward_ios, color: Colors.black,
+                            size: width/18,),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -549,33 +568,38 @@ class _Profile_PageState extends State<Profile_Page> {
 
                     siginoutpopup();
                   },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: width / 25, right: width / 45,
-                        top: height / 94.5, bottom: height / 94.5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          child: Row(
-                            children: [
-                              Icon(Icons.settings_power_rounded,  color: TextColor,
-                                size: width/18,),
-                              SizedBox(width: width / 22,),
+                  child: Container(
+                    color: Colors.white,
+                    height: height/15.12,
+                    width: double.infinity,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: width / 25, right: width / 45,
+                          top: height / 94.5, bottom: height / 94.5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            child: Row(
+                              children: [
+                                Icon(Icons.settings_power_rounded,  color: TextColor,
+                                  size: width/18,),
+                                SizedBox(width: width / 22,),
 
-                              KText(text: "Logout", style: GoogleFonts.nunito(
-                                  color: TextColor,
-                                  fontSize:width/25.69,
-                                  fontWeight: FontWeight.w500
+                                KText(text: "Logout", style: GoogleFonts.nunito(
+                                    color: TextColor,
+                                    fontSize:width/25.69,
+                                    fontWeight: FontWeight.w500
 
-                              ),),
-                            ],
+                                ),),
+                              ],
+                            ),
                           ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, color: Colors.black,
-                          size: width/18,),
+                          Icon(Icons.arrow_forward_ios, color: Colors.black,
+                            size: width/18,),
 
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

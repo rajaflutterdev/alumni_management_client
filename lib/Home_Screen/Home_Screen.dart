@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import '../About_Page/About_Page.dart';
+import '../Apply_For-Job_Post/Apply_For-Job_Post.dart';
 import '../Authndication_Pages/Login_Screen.dart';
 import '../Slders_screen/Slider_Screen.dart';
 import '../Translator_Module/Translator_Module_Page.dart';
@@ -29,6 +30,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   void initState() {
     tabController=TabController(length: 3, vsync: this)  ;
     registerUserfunc();
+    AppliedJobPost();
     // TODO: implement initState
     super.initState();
   }
@@ -39,6 +41,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   List registerEventsList=[];
 
   List <regsiterUser> previousregisterEventsList=[];
+  List <JOBAppliedUser> jobpostAppliedList=[];
 
 
   registerUserfunc() async {
@@ -59,9 +62,32 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
         });
       }
     }
-    print(previousregisterEventsList.first.UserId);
-    print(previousregisterEventsList.first.StreamDocID);
-    print("DynamicListss++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    
+  }
+  
+  
+  AppliedJobPost()async{
+
+    setState(() {
+      jobpostAppliedList.clear();
+    });
+
+    var data=await FirebaseFirestore.instance.collection("JobPosts").orderBy("timestamp").get();
+
+    for(int x=0;x<data.docs.length;x++){
+      for(int  j=0;j<data.docs[x]['registeredUsers'].length;j++){
+        setState(() {
+          jobpostAppliedList.add(
+              JOBAppliedUser(
+                  StreamDocID:data.docs[x].id ,
+                  UserId: data.docs[x]['registeredUsers'][j]
+              )
+          );
+        });
+      }
+    }
+
+
   }
 
   @override
@@ -190,7 +216,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                         }
         
                         return ListView.builder(
-                          physics: const BouncingScrollPhysics(),
+                          physics: const ScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
@@ -330,7 +356,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                       }
         
                       return ListView.builder(
-                        physics: const BouncingScrollPhysics(),
+                        physics: const ScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
@@ -456,8 +482,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                   ///Job Posts Stream
         
                   StreamBuilder(
-                    stream: FirebaseFirestore.instance.collection("JobPosts")
-                        .orderBy("timestamp").snapshots(),
+                    stream: FirebaseFirestore.instance.collection("JobPosts").orderBy("timestamp").snapshots(),
                     builder:(context, snapshot) {
         
                       if(!snapshot.hasData){
@@ -468,123 +493,132 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                       }
         
                       return ListView.builder(
-                        physics: const BouncingScrollPhysics(),
+                        physics: const ScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
+
                           var clgActivitied=snapshot.data!.docs[index];
-                          return  GestureDetector(
-                            onTap:(){
-                              streamDetailsPopup(
-                                  contentImg:clgActivitied['img'],
-                                  contentTime: clgActivitied['uploadTime'],
-                                  contentSubtitle: clgActivitied['subtitle'],
-                                  contentTitle: clgActivitied['title'],
-                                  StreamName: "Job Posts",
-                                  contectDocID: clgActivitied.id
-                              );
-                            },
-                            child: Material(
-                              elevation:15,
-                              color: Color(0xffFFFFFF),
-                              //color: Colors.red,
-                              shadowColor: Colors.black12,
-                              child: Container(
-                                  height: height/8.02,
-                                  width:double.infinity,
-                                  decoration: BoxDecoration(
-                                      color:Color(0xffFFFFFF),
-                                      // color: Colors.red,
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: Colors.grey.shade300
+
+                          if(clgActivitied['verify']==true){
+
+                            return GestureDetector(
+                                onTap:(){
+                                  streamDetailsPopup(
+                                      contentImg:clgActivitied['img'],
+                                      contentTime: clgActivitied['uploadTime'],
+                                      contentSubtitle: clgActivitied['subtitle'],
+                                      contentTitle: clgActivitied['title'],
+                                      StreamName: "Job Posts",
+                                      contectDocID: clgActivitied.id,
+                                      quvalification: clgActivitied['quvalification'],
+                                      location: clgActivitied['location'],
+                                      position: clgActivitied['positions']
+                                  );
+                                },
+                                child: Material(
+                                  elevation:15,
+                                  color: Color(0xffFFFFFF),
+                                  //color: Colors.red,
+                                  shadowColor: Colors.black12,
+                                  child: Container(
+                                      height: height/8.02,
+                                      width:double.infinity,
+                                      decoration: BoxDecoration(
+                                          color:Color(0xffFFFFFF),
+                                          // color: Colors.red,
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey.shade300
+                                              )
                                           )
+                                      ),
+                                      child:Padding(
+                                        padding:  EdgeInsets.symmetric(
+                                            horizontal: width/49,
+                                            vertical: height/100.25
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: height/10.6933,
+                                              width: width/5.226,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade200,
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  image: DecorationImage(
+                                                      fit: BoxFit.cover,
+                                                      image: NetworkImage(clgActivitied['img'].toString())
+                                                  )
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:  EdgeInsets.only(left:width/49),
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height: height/40.1,
+                                                    child:  KText(
+                                                      text:clgActivitied['title'].toString(),
+                                                      style: GoogleFonts.nunito(
+                                                          fontSize: width/30.153,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: ItemTitleColor,
+                                                          textStyle: const TextStyle(
+                                                              overflow: TextOverflow.ellipsis
+                                                          )
+                                                      ),),
+                                                  ),
+
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height:height/19.095,
+                                                    child:  KText(
+                                                      text:clgActivitied['subtitle'].toString(),
+                                                      style: GoogleFonts.nunito(
+                                                          fontSize: width/28,
+                                                          fontWeight: FontWeight.w700,
+                                                          textStyle: const TextStyle(
+                                                            //  overflow: TextOverflow.ellipsis,
+                                                          )
+                                                      ),),
+                                                  ),
+
+                                                  SizedBox(
+                                                    width: width/1.6333,
+                                                    height: height/40.1,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
+                                                        Padding(
+                                                          padding:  EdgeInsets.only(left: width/196),
+                                                          child:  KText(
+                                                            text:clgActivitied['uploadTime'].toString(),
+                                                            style: GoogleFonts.nunito(
+                                                                fontSize: width/30.153,
+                                                                fontWeight: FontWeight.w700,
+                                                                color: ItemTitleColor,
+                                                                textStyle: const TextStyle(
+                                                                    overflow: TextOverflow.ellipsis
+                                                                )
+                                                            ),),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       )
                                   ),
-                                  child:Padding(
-                                    padding:  EdgeInsets.symmetric(
-                                        horizontal: width/49,
-                                        vertical: height/100.25
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                         height: height/10.6933,
-                                          width: width/5.226,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey.shade200,
-                                              borderRadius: BorderRadius.circular(5),
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                  image: NetworkImage(clgActivitied['img'].toString())
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:  EdgeInsets.only(left:width/49),
-                                          child: Column(
-                                            children: [
-                                              SizedBox(
-                                               width: width/1.6333,
-                                                height: height/40.1,
-                                                child:  KText(
-                                                  text:clgActivitied['title'].toString(),
-                                                  style: GoogleFonts.nunito(
-                                                      fontSize: width/30.153,
-                                                      fontWeight: FontWeight.w700,
-                                                      color: ItemTitleColor,
-                                                      textStyle: const TextStyle(
-                                                          overflow: TextOverflow.ellipsis
-                                                      )
-                                                  ),),
-                                              ),
-        
-                                              SizedBox(
-                                               width: width/1.6333,
-                                                height:height/19.095,
-                                                child:  KText(
-                                                  text:clgActivitied['subtitle'].toString(),
-                                                  style: GoogleFonts.nunito(
-                                                      fontSize: width/28,
-                                                      fontWeight: FontWeight.w700,
-                                                      textStyle: const TextStyle(
-                                                        //  overflow: TextOverflow.ellipsis,
-                                                      )
-                                                  ),),
-                                              ),
-        
-                                              SizedBox(
-                                               width: width/1.6333,
-                                                height: height/40.1,
-                                                child: Row(
-                                                  children: [
-                                                    Icon(Icons.access_time_sharp,size: width/26.1333,color: ItemTitleColor,),
-                                                    Padding(
-                                                      padding:  EdgeInsets.only(left: width/196),
-                                                      child:  KText(
-                                                        text:clgActivitied['uploadTime'].toString(),
-                                                        style: GoogleFonts.nunito(
-                                                            fontSize: width/30.153,
-                                                            fontWeight: FontWeight.w700,
-                                                            color: ItemTitleColor,
-                                                            textStyle: const TextStyle(
-                                                                overflow: TextOverflow.ellipsis
-                                                            )
-                                                        ),),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-        
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  )
-                              ),
-                            ),
-                          );
+                                ),
+                              );
+
+                          }
                         },
         
                       );
@@ -690,24 +724,41 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
   }
 
 
-  streamDetailsPopup({contentImg,contentTitle,contentSubtitle,contentTime,StreamName,contectDocID}){
+  streamDetailsPopup({contentImg,contentTitle,contentSubtitle,contentTime,StreamName,contectDocID,location,quvalification,position}){
 
     bool registered=false;
+    bool AppliedJobUser=false;
     setState(() {
     registerEventsList.clear();
     registered=false;
+    AppliedJobUser=false;
     });
 
 
-    previousregisterEventsList.forEach((element) {
-      if(element.StreamDocID==contectDocID){
-        if(element.UserId==widget.UserAuthID){
-          setState(() {
-            registered=true;
-          });
-        }
-      }
-    });
+   if(StreamName=="Job Posts"){
+
+     print("11111111111111111111111111111111111111111111111111111111111111111111111");
+     jobpostAppliedList.forEach((element) {
+       if(element.StreamDocID==contectDocID){
+         if(element.UserId==widget.UserAuthID){
+           setState(() {
+             AppliedJobUser=true;
+           });
+         }
+       }
+     });
+   }
+   else{
+     previousregisterEventsList.forEach((element) {
+       if(element.StreamDocID==contectDocID){
+         if(element.UserId==widget.UserAuthID){
+           setState(() {
+             registered=true;
+           });
+         }
+       }
+     });
+   }
 
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
@@ -716,7 +767,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
       builder: (context){
         return
           Padding(
-            padding:  EdgeInsets.only(top:height/5.3,bottom: height/5.3),
+            padding:  EdgeInsets.only(top: StreamName=="Job Posts"?height/7.5:height/6.0,bottom:  StreamName=="Job Posts"?height/7.5:height/6.0),
             child: AlertDialog(
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -742,11 +793,12 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                   SizedBox(
                     height: height/53.466,
                   ),
+
                   SizedBox(
                     width:width/1.6333,
                     child:  Center(
-                      child: KText(
-                        text: contentTitle.toString(),
+                      child: Text(
+                         contentTitle.toString(),
                         style: GoogleFonts.nunito(
                           textStyle: TextStyle(
                             overflow: TextOverflow.ellipsis
@@ -756,12 +808,12 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                     ),
                   ),
 
-                  SizedBox(
-                    height: height/16.04,
+                  Container(
+                    height: height/10.04,
                     width:width/1.6333,
-                    child:  KText(
-                      text:
-                      contentSubtitle.toString(),
+                    color:Colors.transparent,
+                    child:  Text(
+                      "Description: ${contentSubtitle.toString()}",
                       style: GoogleFonts.nunito(
                           textStyle: const TextStyle(
                             //overflow: TextOverflow.ellipsis
@@ -769,10 +821,46 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                           fontWeight:
                       FontWeight.w700,color: textcolor,fontSize: width/32.666),),
                   ),
+
+                  StreamName=="Job Posts"?
+                  SizedBox(
+                    width:width/1.6333,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Qualification : ${quvalification.toString()}",
+                          style: GoogleFonts.nunito(
+                              textStyle: const TextStyle(
+                                //overflow: TextOverflow.ellipsis
+                              ),
+                              fontWeight:
+                              FontWeight.w700,color: textcolor,fontSize: width/32.666),),
+                        Text(
+                          "Position : ${position.toString()}",
+                          style: GoogleFonts.nunito(
+                              textStyle: const TextStyle(
+                                //overflow: TextOverflow.ellipsis
+                              ),
+                              fontWeight:
+                              FontWeight.w700,color: textcolor,fontSize: width/32.666),),
+                        Text(
+                          "Location : ${location.toString()}",
+                          style: GoogleFonts.nunito(
+                              textStyle: const TextStyle(
+                                //overflow: TextOverflow.ellipsis
+                              ),
+                              fontWeight:
+                              FontWeight.w700,color: textcolor,fontSize: width/32.666),),
+                      ],
+                    ),
+                  ):const SizedBox(),
+
+
                   Padding(
                     padding:  EdgeInsets.only(top: height/70.25,bottom: height/70.25),
-                    child:  KText(
-                      text: "Upload Time : ${contentTime.toString()}",
+                    child:  Text(
+                       "Upload Time : ${contentTime.toString()}",
                       style: GoogleFonts.nunito(fontWeight:
                       FontWeight.w700,color: textcolor,fontSize: width/32.666),),
                   ),
@@ -795,7 +883,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                           color: buttoncolor,
                         ),
                         child: Center(
-                          child:  KText(text:" Your Already Register this Events",
+                          child:  Text(" Your Already Register this Events",
                             style: GoogleFonts.nunito(fontWeight:
                             FontWeight.w800,color: Colors.white,fontSize: width/28.666),),
                         ),
@@ -828,7 +916,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                           color: buttoncolor,
                         ),
                         child: Center(
-                          child:  KText(text:"Book Events",
+                          child:  Text("Book Events",
                             style: GoogleFonts.nunito(fontWeight:
                             FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
                         ),
@@ -836,12 +924,48 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                       ),
                     ),
                   ):
-                  StreamName=="Job Posts"?
+                  StreamName=="Job Posts"&&AppliedJobUser==true?
+                  GestureDetector(
+
+                   onTap: (){
+                     Navigator.pop(context);
+                   },
+                    child: Material(
+                      elevation: 5,
+                      shadowColor: Colors.indigo,
+                      borderRadius: BorderRadius.circular(55),
+                      color: buttoncolor,
+                      child: Container(
+                        height:height/20.05,
+                        width: width/2.5,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(55),
+                          color: buttoncolor,
+                        ),
+                        child: Center(
+                          child:  Text("Applied this Job",
+                            style: GoogleFonts.nunito(fontWeight:
+                            FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
+                        ),
+
+                      ),
+                    ),
+                  ):
                   GestureDetector(
                     onTap: (){
+                      AppliedJobPost();
                       Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>Apply_For_Job_Post(
+                        DocumentId: contectDocID,
+                        CompanyName: contentTitle,
+                        CompanydesCription: contentSubtitle,
+                        Companypositions: position,
+                        AuthID: widget.UserAuthID.toString(),
+                      ) ,));
+
                     },
-                    child: Material(
+                    child:
+                    Material(
                       elevation: 5,
                       shadowColor: Colors.indigo,
                       borderRadius: BorderRadius.circular(55),
@@ -854,33 +978,7 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
                           color: buttoncolor,
                         ),
                         child: Center(
-                          child:  KText(text:"View Post",
-                            style: GoogleFonts.nunito(fontWeight:
-                            FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
-                        ),
-
-                      ),
-                    ),
-                  ):
-                  GestureDetector(
-                    onTap: (){
-
-                      Navigator.pop(context);
-                    },
-                    child: Material(
-                      elevation: 5,
-                      shadowColor: Colors.indigo,
-                      borderRadius: BorderRadius.circular(55),
-                      color: buttoncolor,
-                      child: Container(
-                        height:height/20.05,
-                        width: width/3.2666,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(55),
-                          color: buttoncolor,
-                        ),
-                        child: Center(
-                          child:  KText(text:"Okay",
+                          child:  Text("Apply for Job",
                             style: GoogleFonts.nunito(fontWeight:
                             FontWeight.w800,color: Colors.white,fontSize: width/26.666),),
                         ),
@@ -1036,9 +1134,15 @@ class _Home_ScreenState extends State<Home_Screen> with SingleTickerProviderStat
 }
 
 class regsiterUser{
-
   String ?UserId;
   String?StreamDocID;
   regsiterUser({this.StreamDocID,this.UserId});
+
+}
+
+class JOBAppliedUser{
+  String ?UserId;
+  String?StreamDocID;
+  JOBAppliedUser({this.StreamDocID,this.UserId});
 
 }

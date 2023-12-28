@@ -16,7 +16,8 @@ class Group_Chat_Screen extends StatefulWidget {
   String?groupImg;
   String?groupdepart;
   String?grouppassesyear;
-   Group_Chat_Screen({this.groupImg,this.groupdepart,this.grouppassesyear,this.Docid});
+  String?groupcolor;
+   Group_Chat_Screen({this.groupImg,this.groupdepart,this.grouppassesyear,this.Docid,this.groupcolor});
 
   @override
   State<Group_Chat_Screen> createState() => _Group_Chat_ScreenState();
@@ -76,13 +77,27 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
                       height: height/16.04,
                       width: width/7.84,
                       decoration: BoxDecoration(
-                          color: Colors.grey,
+                          color: Color(int.parse(widget.groupcolor.toString())),
                           borderRadius: BorderRadius.circular(width/13.66),
                           image: DecorationImage(
                             fit: BoxFit.cover,
                             image: NetworkImage(widget.groupImg.toString()),
-
                           )
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.groupImg.toString()==""?
+                          groupNameTextfunc(widget.groupdepart.toString()):"",
+                          style: GoogleFonts.nunito(
+                              fontSize: width/26.1333,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              textStyle: TextStyle(
+                                //  overflow: TextOverflow.ellipsis,
+                              )
+                          ),
+
+                        ),
                       ),
                     ),
                     Padding(
@@ -521,5 +536,10 @@ class _Group_Chat_ScreenState extends State<Group_Chat_Screen> {
 
     Navigator.pop(context);
   }
+  groupNameTextfunc(groupName){
 
+    List<String> words = groupName.split(" ");
+    String result=words.length>1? "${words[0].substring(0,1)}${words[1].substring(0,1)}":words.toString().substring(1,3);
+    return  result;
+  }
 }

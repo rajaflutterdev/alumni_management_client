@@ -5,8 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Constant_File.dart';
@@ -132,9 +130,7 @@ getToekt()async{
                    width:width/1.37,
                    child: StreamBuilder(
                        stream:FirebaseFirestore.instance.collection("Users").orderBy("timestamp").snapshots() ,
-
                        builder: (context, snapshot) {
-
                          if(!snapshot.hasData){
                            return const Center(child: CircularProgressIndicator(),);
                          }
@@ -196,15 +192,18 @@ getToekt()async{
                                          height: height / 16.04,
                                          width: width / 7.84,
                                          decoration: BoxDecoration(
-                                             color: Colors.grey,
+                                             color: Colors.grey.shade200,
                                              borderRadius: BorderRadius
                                                  .circular(width/3.6),
                                              image: DecorationImage(
                                                fit: BoxFit.cover,
                                                image: NetworkImage(
-                                                   Userdata['UserImg']
-                                                       .toString()),
+                                                   Userdata['UserImg'].toString()),
                                              )
+                                         ),
+
+                                         child: Center(
+                                           child: Userdata['UserImg'].toString()==""?Icon(Icons.person):Text(""),
                                          ),
                                        ),
                                        title: SizedBox(
@@ -253,117 +252,122 @@ getToekt()async{
                        },),
                  ),
 
-                  StreamBuilder(
-                    stream:FirebaseFirestore.instance.collection("Groups").where("Department",isEqualTo:widget.UserDepartment)
-                        .where("AccademicYear",isEqualTo:widget.UserPassedYear).snapshots() ,
+                  SizedBox(
+                    width:width/1.37,
+                    child: StreamBuilder(
+                      stream:FirebaseFirestore.instance.collection("Groups").where("Department",isEqualTo:widget.UserDepartment.toString())
+                          .where("AccademicYear",isEqualTo:widget.UserPassedYear.toString()).snapshots() ,
 
-                    builder: (context, snap) {
+                      builder: (context, snap) {
 
-                      if(!snap.hasData){
-                        return const Center(child: CircularProgressIndicator(),);
-                      }
-                      if(snap.hasData==null){
-                        return const Center(child: CircularProgressIndicator(),);
-                      }
+                        if(!snap.hasData){
+                          return const Center(child: CircularProgressIndicator(),);
+                        }
+                        if(snap.hasData==null){
+                          return const Center(child: CircularProgressIndicator(),);
+                        }
 
 
-                      return
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snap.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            var groupData=snap.data!.docs[index];
-                            return
-                              GestureDetector(
-                                onTap: (){
-                                  // Get.to(
-                                  //     Group_Chat_Screen(
-                                  //       Docid: groupData.id,
-                                  //       groupdepart: groupData['Department'].toString(),
-                                  //       grouppassesyear:  groupData['AccademicYear'].toString(),
-                                  //       groupImg: groupData['Img'].toString()==""?AvatorImg.toString():groupData['Img'].toString(),
-                                  //     ),transition: Transition.zoom ,
-                                  //     curve: Curves.linearToEaseOut,
-                                  //     duration: Duration(milliseconds: 200)
-                                  // );
+                       return ListView.builder(
+                         shrinkWrap: true,
+                         itemCount: snap.data!.docs.length,
+                         itemBuilder: (context, index) {
+                           var groupData=snap.data!.docs[index];
+                           return
+                             GestureDetector(
+                               onTap: (){
+                                 // Get.to(
+                                 //     Group_Chat_Screen(
+                                 //       Docid: groupData.id,
+                                 //       groupdepart: groupData['Department'].toString(),
+                                 //       grouppassesyear:  groupData['AccademicYear'].toString(),
+                                 //       groupImg: groupData['Img'].toString()==""?AvatorImg.toString():groupData['Img'].toString(),
+                                 //     ),transition: Transition.zoom ,
+                                 //     curve: Curves.linearToEaseOut,
+                                 //     duration: Duration(milliseconds: 200)
+                                 // );
 
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Group_Chat_Screen(
-                                    Docid: groupData.id,
-                                    groupdepart: groupData['Department'].toString(),
-                                    grouppassesyear:  groupData['AccademicYear'].toString(),
-                                    groupImg: groupData['Img'].toString()==""?AvatorImg.toString():groupData['Img'].toString(),
-                                  ) ,));
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: Colors.grey.shade300
-                                          )
-                                      )
-                                  ),
-                                  child: ListTile(
-                                    leading: Container(
-                                      height: height/16.04,
-                                      width: width/7.84,
+                                 Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                     Group_Chat_Screen(
+                                         Docid: groupData.id,
+                                         groupdepart: groupData['Department'].toString(),
+                                         grouppassesyear:  groupData['AccademicYear'].toString(),
+                                         groupImg: groupData['Img'].toString(),
+                                         groupcolor:groupData['color'].toString()
 
-                                      child: Center(
-                                        child: Text(
-                                            groupData['Img'].toString()==""?
-                                            groupNameTextfunc(groupData['Department'].toString()):"",
-                                          style: GoogleFonts.nunito(
-                                              fontSize: width/26.1333,
-                                              fontWeight: FontWeight.w800,
-                                              color: Colors.white,
-                                              textStyle: TextStyle(
-                                                //  overflow: TextOverflow.ellipsis,
-                                              )
-                                          ),
+                                     ) ,));
+                               },
+                               child: Container(
+                                 decoration: BoxDecoration(
+                                     border: Border(
+                                         bottom: BorderSide(
+                                             color: Colors.grey.shade300
+                                         )
+                                     )
+                                 ),
+                                 child: ListTile(
+                                   leading: Container(
+                                     height: height/16.04,
+                                     width: width/7.84,
 
-                                        ),
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: randomOpaqueColor(),
-                                          borderRadius: BorderRadius.circular(width/3.6),
-                                          image: DecorationImage(
-                                            image: NetworkImage(groupData['Img'].toString()),
+                                     child: Center(
+                                       child: Text(
+                                         groupData['Img'].toString()==""?
+                                         groupNameTextfunc(groupData['Department'].toString()):"",
+                                         style: GoogleFonts.nunito(
+                                             fontSize: width/26.1333,
+                                             fontWeight: FontWeight.w800,
+                                             color: Colors.white,
+                                             textStyle: TextStyle(
+                                               //  overflow: TextOverflow.ellipsis,
+                                             )
+                                         ),
 
-                                          )
-                                      ),
-                                    ),
-                                    title:  SizedBox(
-                                      width: width/1.6333,
-                                      height:height/40.1,
-                                      child:
-                                      KText(
-                                        text:groupData['Department'].toString(),
-                                        style: GoogleFonts.nunito(
-                                            fontSize: width/26.1333,
-                                            fontWeight: FontWeight.w800,
-                                            textStyle: TextStyle(
-                                              //  overflow: TextOverflow.ellipsis,
-                                            )
-                                        ),),
-                                    ),
-                                    subtitle:  SizedBox(
-                                      width: width/1.6333,
-                                      height: height/40.1,
-                                      child:  KText(
-                                        text:"${groupData['AccademicYear'].toString()}",
-                                        style: GoogleFonts.nunito(
-                                            fontSize: width/30.153,
-                                            color: Color(0xff000000),
-                                            fontWeight: FontWeight.w600,
-                                            textStyle: TextStyle(
-                                                overflow: TextOverflow.ellipsis
-                                            )
-                                        ),),
-                                    ),
-                                  ),
-                                ),
-                              );
-                          },);
-                    },),
+                                       ),
+                                     ),
+                                     decoration: BoxDecoration(
+                                         color: Color(int.parse(groupData["color"].toString())),
+                                         borderRadius: BorderRadius.circular(width/3.6),
+                                         image: DecorationImage(
+                                           image: NetworkImage(groupData['Img'].toString()),
+
+                                         )
+                                     ),
+                                   ),
+                                   title:  SizedBox(
+                                     width: width/1.6333,
+                                     height:height/40.1,
+                                     child:
+                                     KText(
+                                       text:groupData['Department'].toString(),
+                                       style: GoogleFonts.nunito(
+                                           fontSize: width/26.1333,
+                                           fontWeight: FontWeight.w800,
+                                           textStyle: TextStyle(
+                                             //  overflow: TextOverflow.ellipsis,
+                                           )
+                                       ),),
+                                   ),
+                                   subtitle:  SizedBox(
+                                     width: width/1.6333,
+                                     height: height/40.1,
+                                     child:  KText(
+                                       text:"${groupData['AccademicYear'].toString()}",
+                                       style: GoogleFonts.nunito(
+                                           fontSize: width/30.153,
+                                           color: Color(0xff000000),
+                                           fontWeight: FontWeight.w600,
+                                           textStyle: TextStyle(
+                                               overflow: TextOverflow.ellipsis
+                                           )
+                                       ),),
+                                   ),
+                                 ),
+                               ),
+                             );
+                         },);
+                      },),
+                  ),
 
                 ],
               ),

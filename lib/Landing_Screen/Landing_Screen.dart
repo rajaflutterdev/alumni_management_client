@@ -1,15 +1,8 @@
-import 'dart:math';
-
-import 'package:alumni_management_client/Translator_Module/Translator_Module_Page.dart';
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-
-import '../Authndication_Pages/Login_Screen.dart';
 import '../Constant_File.dart';
 import '../Home_Screen/Home_Screen.dart';
 import '../Menbers_Screen/Member_Screen.dart';
@@ -42,7 +35,6 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
   @override
   void initState() {
     UserGetDataFuntion();
-    getLatLng();
     // TODO: implement initState
     super.initState();
   }
@@ -56,7 +48,9 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
     double height=MediaQuery.of(context).size.height;
     double width=MediaQuery.of(context).size.width;
     List Pages=[
+
       Home_Screen(Username: Username,UserAuthID: UsersDocID),
+
       Member_Screen(
         userLatitude: lat,
         userLongtitude: lon,
@@ -65,8 +59,9 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
           UsersrollNo:UsersrollNo
       ),
       Message_Screen(
-        UserDepartment: UsersDepartment,
         UserPassedYear: UsersPassedYear,
+        UserDepartment: UsersDepartment,
+
       ),
       Profile_Page(
         userName: Username,
@@ -241,22 +236,17 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
     print("Enter+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     var Userdata=await FirebaseFirestore.instance.collection('Users').
     where("userDocId",isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
-    await Geolocator.requestPermission();
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      lat = position.latitude!;
-      lon = position.longitude!;
-    });
+
    if(Userdata.docs.length>0){
      setState(() {
        Username = Userdata.docs[0]["Name"].toString();
+       UsersDocID=Userdata.docs[0].id;
        Userloaction = Userdata.docs[0]["Address"].toString();
        Userqulification = Userdata.docs[0]["educationquvalification"].toString();
        Useroccupation = Userdata.docs[0]["Occupation"].toString();
        UsersDepartment = Userdata.docs[0]["subjectStream"].toString();
        UsersPassedYear = Userdata.docs[0]["yearofpassed"].toString();
        UsersrollNo = Userdata.docs[0]["rollNo"].toString();
-       UsersDocID=Userdata.docs[0].id;
        UserImg =Userdata.docs[0]["UserImg"].toString()==""?AvatorImg: Userdata.docs[0]["UserImg"].toString();
      });
 
@@ -276,18 +266,16 @@ class _Landing_ScreenState extends State<Landing_Screen> with SingleTickerProvid
      print(UsersPassedYear);
      print("Printing the Users Detailsssssssssssssssssssssssssssssssssssssssss");
    }
+
+   print("User Docuemnt Documen ID-----------------------------------------");
+   print(UsersDocID);
+    await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      lat = position.latitude!;
+      lon = position.longitude!;
+    });
   }
-
-
-  getLatLng() async {
-
-
-
-    print("Longtitude_____________________________________$lon");
-    print("Lattttitude_____________________________________$lat");
-  }
-
-
 
 
 
